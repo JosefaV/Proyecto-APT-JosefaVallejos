@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block contenido %}
+<h1>Bitácora de Acciones</h1>
+<table>
+  <tr><th>Fecha y hora</th><th>Usuario</th><th>Acción</th><th>Tratamiento</th><th>Detalle</th></tr>
+  {% for b in filas %}
+  <tr><td>{{ b.fecha_hora }}</td><td>{{ b.usuario }}</td><td>{{ b.accion }}</td><td>{{ b.actividad or '—' }}</td><td>{{ b.detalle }}</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}

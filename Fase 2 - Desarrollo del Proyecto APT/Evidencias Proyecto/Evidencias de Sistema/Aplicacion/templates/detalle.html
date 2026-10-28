@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block contenido %}
+<p><a class="btn sec" href="{{ url_for('registro') }}">← Volver al registro</a></p>
+<h1><span class="luz {{ semaforo }}"></span> {{ t.actividad }}</h1>
+<div class="caja">
+  <b>Área:</b> {{ t.area_nombre }} · <b>Responsable:</b> {{ t.responsable }}<br>
+  <b>Finalidad:</b> {{ t.finalidad }}<br>
+  <b>Datos:</b> {{ t.categoria_dato }} ({{ t.detalle_datos }})<br>
+  <b>Titulares:</b> {{ t.grupo_titular }} · {{ t.titulares }}<br>
+  <b>Base de licitud:</b> {{ t.base_licitud or '—' }} · <b>Origen:</b> {{ t.origen }}<br>
+  <b>Tercero:</b> {{ t.tercero_nombre or 'Ninguno' }}<br>
+  <b>Plazo:</b> {{ t.plazo_meses }} meses · <b>Supresión:</b>
+  {% if supresion %}{{ supresion.strftime('%d-%m-%Y') }}{% else %}—{% endif %}<br>
+  <b>Última revisión:</b> {% if t.revisado_por %}{{ t.revisado_por }} ({{ t.fecha_revision }}){% else %}pendiente{% endif %}
+</div>
+<div class="caja">
+  <h3>Brechas detectadas</h3>
+  {% if brechas %}
+    <ul>{% for g, texto in brechas %}<li><span class="{{ g }}">{{ g }}</span>: {{ texto }}</li>{% endfor %}</ul>
+  {% else %}<p>No se detectaron brechas.</p>{% endif %}
+</div>
+<div class="aviso">El sistema solo sugiere. Cada decisión la confirma una persona y queda en la bitácora.</div>
+<div class="caja">
+  <h3>Decisión de la persona responsable</h3>
+  <form method="post" action="{{ url_for('revisar', tid=t.id) }}" style="display:block;margin-bottom:10px">
+    <input type="text" name="usuario" placeholder="Tu nombre" required>
+    <button type="submit" class="btn">Confirmar revisión</button>
+  </form>
+  <form method="post" action="{{ url_for('suprimir', tid=t.id) }}" style="display:block"
+        onsubmit="return confirm('¿Confirmas que los datos fueron suprimidos?');">
+    <input type="text" name="usuario" placeholder="Tu nombre" required>
+    <button type="submit" class="btn sec">Marcar como suprimido</button>
+  </form>
+</div>
+<div class="caja">
+  <h3>Historial</h3>
+  {% if hist %}<ul>{% for h in hist %}<li>{{ h.fecha_hora }} · {{ h.usuario }} · {{ h.accion }}: {{ h.detalle }}</li>{% endfor %}</ul>
+  {% else %}<p>Sin acciones registradas.</p>{% endif %}
+</div>
+{% endblock %}

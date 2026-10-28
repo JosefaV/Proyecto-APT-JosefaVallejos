@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block contenido %}
+<h1>Registro de Tratamientos</h1>
+<p class="sub">Los tratamientos en rojo aparecen primero. Haz clic en una actividad para ver sus brechas y decidir.</p>
+<div class="fila">
+  <div class="tarjeta"><span class="luz rojo"></span>Rojo<b>{{ cuenta.rojo }}</b></div>
+  <div class="tarjeta"><span class="luz amarillo"></span>Amarillo<b>{{ cuenta.amarillo }}</b></div>
+  <div class="tarjeta"><span class="luz verde"></span>Verde<b>{{ cuenta.verde }}</b></div>
+</div>
+<table>
+  <tr><th>Estado</th><th>Actividad</th><th>Área</th><th>Categoría</th><th>Base de licitud</th><th>Supresión</th><th>Brechas</th></tr>
+  {% for f in filas %}
+  <tr>
+    <td><span class="luz {{ f.semaforo }}"></span></td>
+    <td><a href="{{ url_for('detalle', tid=f.t.id) }}">{{ f.t.actividad }}</a></td>
+    <td>{{ f.t.area_nombre }}</td>
+    <td>{{ f.t.categoria_dato }}</td>
+    <td>{{ f.t.base_licitud or '—' }}</td>
+    <td>{% if f.supresion %}{{ f.supresion.strftime('%d-%m-%Y') }}{% else %}—{% endif %}</td>
+    <td>{{ f.brechas|length }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

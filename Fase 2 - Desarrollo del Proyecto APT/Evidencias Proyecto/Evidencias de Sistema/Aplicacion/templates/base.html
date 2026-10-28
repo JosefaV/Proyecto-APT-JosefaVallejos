@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block titulo %}Transparenta{% endblock %}</title>
+<style>
+  @font-face { font-family:'Caprasimo'; src:url('{{ url_for("static", filename="fonts/caprasimo.woff2") }}') format('woff2'); }
+  @font-face { font-family:'Nunito'; font-weight:400; src:url('{{ url_for("static", filename="fonts/nunito-400.woff2") }}') format('woff2'); }
+  @font-face { font-family:'Nunito'; font-weight:700; src:url('{{ url_for("static", filename="fonts/nunito-700.woff2") }}') format('woff2'); }
+  :root { --celeste:#BFE3F2; --celeste2:#A9D6EA; --crema:#FFFBF0; --vainilla:#FFF3C4; --banana:#FFE08A;
+          --marino:#2B4A6F; --borde:#D9EAF3; --gris:#6B7C93; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:'Nunito', Calibri, Arial, sans-serif; background:var(--crema); color:var(--marino); font-size:16px; }
+  header { background:var(--celeste); border-bottom:4px solid var(--banana); }
+  .barra { max-width:1150px; margin:0 auto; padding:10px 24px; display:flex; align-items:center; gap:28px; flex-wrap:wrap; }
+  .barra img { height:70px; display:block; }
+  nav { display:flex; gap:8px; margin-left:auto; }
+  nav a { color:var(--marino); text-decoration:none; font-weight:700; padding:9px 18px; border-radius:999px; }
+  nav a:hover { background:#fff; }
+  nav a.activo { background:var(--vainilla); border:1px solid var(--banana); }
+  main { max-width:1150px; margin:26px auto; padding:0 24px 40px; }
+  h1, h2 { font-family:'Caprasimo', Georgia, serif; font-weight:400; margin:0 0 12px; }
+  h1 { font-size:34px; } h2 { font-size:24px; } h3 { margin:0 0 8px; }
+  .sub { color:var(--gris); margin:0 0 22px; font-size:17px; }
+  .fila { display:flex; gap:16px; flex-wrap:wrap; margin-bottom:22px; }
+  .tarjeta { flex:1; min-width:200px; background:#fff; border:1px solid var(--borde); border-radius:18px; padding:16px 20px; box-shadow:0 2px 6px rgba(120,160,190,.18); }
+  .tarjeta b { font-family:'Caprasimo', Georgia, serif; font-weight:400; font-size:42px; display:block; line-height:1.1; }
+  .tarjeta small { color:var(--gris); }
+  .paso { flex:1; min-width:240px; background:#fff; border:1px solid var(--borde); border-radius:18px; padding:18px 20px; }
+  .num { display:inline-flex; width:38px; height:38px; border-radius:50%; background:var(--banana); align-items:center; justify-content:center;
+         font-family:'Caprasimo', Georgia, serif; font-size:20px; margin-bottom:8px; }
+  .caja { background:#fff; border:1px solid var(--borde); border-radius:18px; padding:18px 22px; margin-bottom:18px; }
+  .aviso { background:var(--vainilla); border:1px solid var(--banana); border-radius:18px; padding:14px 20px; margin-bottom:18px; }
+  table { width:100%; border-collapse:separate; border-spacing:0; background:#fff; border:1px solid var(--borde); border-radius:14px; overflow:hidden; }
+  th { background:var(--celeste); color:var(--marino); text-align:left; padding:10px 12px; }
+  td { padding:10px 12px; border-top:1px solid var(--borde); vertical-align:top; }
+  tr:hover td { background:#F5FAFD; }
+  .luz { display:inline-block; width:16px; height:16px; border-radius:50%; vertical-align:middle; margin-right:6px; }
+  .rojo { background:#EE7B76; } .amarillo { background:#F7D060; } .verde { background:#7DCB9C; }
+  .btn { display:inline-block; background:var(--banana); color:var(--marino); border:1px solid #F0C95A; border-radius:999px; padding:10px 22px;
+         font-weight:700; cursor:pointer; text-decoration:none; font-family:inherit; font-size:16px; }
+  .btn:hover { background:#FFD966; }
+  .btn.sec { background:var(--celeste); border-color:var(--celeste2); }
+  input[type=text] { padding:9px 12px; border:1px solid var(--celeste2); border-radius:999px; font-family:inherit; font-size:15px; }
+  a { color:#2A6FA8; }
+  .Alta { color:#C0392B; font-weight:700; } .Media { color:#9A6B00; font-weight:700; }
+  .ayuda { color:var(--gris); font-size:14px; }
+  ul.limpia { list-style:none; margin:0; padding:0; } ul.limpia li { padding:8px 0; border-top:1px solid var(--borde); } ul.limpia li:first-child { border-top:0; }
+</style>
+</head>
+<body>
+<header><div class="barra">
+  <a href="{{ url_for('inicio') }}"><img src="{{ url_for('static', filename='logo.png') }}" alt="Transparenta"></a>
+  <nav>
+    <a href="{{ url_for('inicio') }}" class="{{ 'activo' if request.endpoint == 'inicio' }}">Inicio</a>
+    <a href="{{ url_for('registro') }}" class="{{ 'activo' if request.endpoint in ('registro','detalle') }}">Registro</a>
+    <a href="{{ url_for('bitacora') }}" class="{{ 'activo' if request.endpoint == 'bitacora' }}">Bitácora</a>
+  </nav>
+</div></header>
+<main>{% block contenido %}{% endblock %}</main>
+</body>
+</html>

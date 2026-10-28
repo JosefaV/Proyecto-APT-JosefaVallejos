@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block contenido %}
+<h1>Bienvenida a Transparenta</h1>
+<p class="sub">Registra cómo tu organización trata datos personales, detecta brechas y recibe avisos de plazos. Empresa de ejemplo: <b>Nexa Soluciones TI</b> (datos ficticios).</p>
+
+<h2>Cómo se usa</h2>
+<div class="fila">
+  <div class="paso"><span class="num">1</span><h3>Mira el semáforo</h3>
+    Cada tratamiento tiene un color: <span class="luz rojo"></span>rojo si hay brechas graves, <span class="luz amarillo"></span>amarillo si hay avisos y <span class="luz verde"></span>verde si está en orden.</div>
+  <div class="paso"><span class="num">2</span><h3>Abre un tratamiento</h3>
+    Entra al detalle para ver qué le falta y por qué. El sistema solo sugiere; no decide por ti.</div>
+  <div class="paso"><span class="num">3</span><h3>Confirma tu decisión</h3>
+    Pulsa <b>Confirmar revisión</b> o <b>Marcar como suprimido</b>. Cada acción queda en la bitácora.</div>
+</div>
+
+<h2>Resumen general</h2>
+<div class="fila">
+  <div class="tarjeta"><span class="luz rojo"></span>Requieren atención<b>{{ cuenta.rojo }}</b><small>de {{ total }} tratamientos</small></div>
+  <div class="tarjeta"><span class="luz amarillo"></span>Con avisos<b>{{ cuenta.amarillo }}</b><small>revisar pronto</small></div>
+  <div class="tarjeta"><span class="luz verde"></span>En orden<b>{{ cuenta.verde }}</b><small>sin brechas</small></div>
+  <div class="tarjeta">Sin revisión humana<b>{{ sin_revisar }}</b><small>esperan confirmación</small></div>
+</div>
+
+<div class="fila">
+  <div class="caja" style="flex:1.3;min-width:320px;margin:0">
+    <h3>Atender primero</h3>
+    {% if urgentes %}
+    <ul class="limpia">{% for f in urgentes %}
+      <li><span class="luz rojo"></span><a href="{{ url_for('detalle', tid=f.t.id) }}"><b>{{ f.t.actividad }}</b></a>
+          <span class="ayuda"> · {{ f.t.area_nombre }} · {{ f.brechas|length }} brecha(s)</span></li>
+    {% endfor %}</ul>
+    {% else %}<p>No hay tratamientos en rojo. 🎉</p>{% endif %}
+    <p style="margin:14px 0 0"><a class="btn" href="{{ url_for('registro') }}">Ver todo el registro</a></p>
+  </div>
+  <div class="caja" style="flex:1;min-width:280px;margin:0">
+    <h3>Próximos vencimientos</h3>
+    {% if por_vencer %}
+    <ul class="limpia">{% for f in por_vencer %}
+      <li><a href="{{ url_for('detalle', tid=f.t.id) }}">{{ f.t.actividad }}</a>
+          <span class="ayuda"> · en {{ f.dias }} días ({{ f.supresion.strftime('%d-%m-%Y') }})</span></li>
+    {% endfor %}</ul>
+    {% else %}<p class="ayuda">No hay plazos que venzan en los próximos 60 días.</p>{% endif %}
+  </div>
+</div>
+
+<div class="caja" style="margin-top:18px">
+  <h3>Últimas acciones</h3>
+  <ul class="limpia">{% for b in ultimas %}
+    <li>{{ b.fecha_hora }} · <b>{{ b.usuario }}</b> · {{ b.accion }}
+        <span class="ayuda">{% if b.actividad %}— {{ b.actividad }}{% endif %}</span></li>
+  {% endfor %}</ul>
+  <p style="margin:12px 0 0"><a class="btn sec" href="{{ url_for('bitacora') }}">Ver la bitácora completa</a></p>
+</div>
+
+<div class="aviso"><b>Principio de diseño:</b> el software ordena, revisa y recuerda; cada revisión y cada supresión la confirma una persona.
+ Las reglas son un apoyo y no reemplazan el análisis jurídico.</div>
+{% endblock %}
