@@ -3,61 +3,57 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{% block titulo %}Transparenta{% endblock %}</title>
-<style>
-  @font-face { font-family:'Caprasimo'; src:url('{{ url_for("static", filename="fonts/caprasimo.woff2") }}') format('woff2'); }
-  @font-face { font-family:'Nunito'; font-weight:400; src:url('{{ url_for("static", filename="fonts/nunito-400.woff2") }}') format('woff2'); }
-  @font-face { font-family:'Nunito'; font-weight:700; src:url('{{ url_for("static", filename="fonts/nunito-700.woff2") }}') format('woff2'); }
-  :root { --celeste:#BFE3F2; --celeste2:#A9D6EA; --crema:#FFFBF0; --vainilla:#FFF3C4; --banana:#FFE08A;
-          --marino:#2B4A6F; --borde:#D9EAF3; --gris:#6B7C93; }
-  * { box-sizing:border-box; }
-  body { margin:0; font-family:'Nunito', Calibri, Arial, sans-serif; background:var(--crema); color:var(--marino); font-size:16px; }
-  header { background:var(--celeste); border-bottom:4px solid var(--banana); }
-  .barra { max-width:1150px; margin:0 auto; padding:10px 24px; display:flex; align-items:center; gap:28px; flex-wrap:wrap; }
-  .barra img { height:70px; display:block; }
-  nav { display:flex; gap:8px; margin-left:auto; }
-  nav a { color:var(--marino); text-decoration:none; font-weight:700; padding:9px 18px; border-radius:999px; }
-  nav a:hover { background:#fff; }
-  nav a.activo { background:var(--vainilla); border:1px solid var(--banana); }
-  main { max-width:1150px; margin:26px auto; padding:0 24px 40px; }
-  h1, h2 { font-family:'Caprasimo', Georgia, serif; font-weight:400; margin:0 0 12px; }
-  h1 { font-size:34px; } h2 { font-size:24px; } h3 { margin:0 0 8px; }
-  .sub { color:var(--gris); margin:0 0 22px; font-size:17px; }
-  .fila { display:flex; gap:16px; flex-wrap:wrap; margin-bottom:22px; }
-  .tarjeta { flex:1; min-width:200px; background:#fff; border:1px solid var(--borde); border-radius:18px; padding:16px 20px; box-shadow:0 2px 6px rgba(120,160,190,.18); }
-  .tarjeta b { font-family:'Caprasimo', Georgia, serif; font-weight:400; font-size:42px; display:block; line-height:1.1; }
-  .tarjeta small { color:var(--gris); }
-  .paso { flex:1; min-width:240px; background:#fff; border:1px solid var(--borde); border-radius:18px; padding:18px 20px; }
-  .num { display:inline-flex; width:38px; height:38px; border-radius:50%; background:var(--banana); align-items:center; justify-content:center;
-         font-family:'Caprasimo', Georgia, serif; font-size:20px; margin-bottom:8px; }
-  .caja { background:#fff; border:1px solid var(--borde); border-radius:18px; padding:18px 22px; margin-bottom:18px; }
-  .aviso { background:var(--vainilla); border:1px solid var(--banana); border-radius:18px; padding:14px 20px; margin-bottom:18px; }
-  table { width:100%; border-collapse:separate; border-spacing:0; background:#fff; border:1px solid var(--borde); border-radius:14px; overflow:hidden; }
-  th { background:var(--celeste); color:var(--marino); text-align:left; padding:10px 12px; }
-  td { padding:10px 12px; border-top:1px solid var(--borde); vertical-align:top; }
-  tr:hover td { background:#F5FAFD; }
-  .luz { display:inline-block; width:16px; height:16px; border-radius:50%; vertical-align:middle; margin-right:6px; }
-  .rojo { background:#EE7B76; } .amarillo { background:#F7D060; } .verde { background:#7DCB9C; }
-  .btn { display:inline-block; background:var(--banana); color:var(--marino); border:1px solid #F0C95A; border-radius:999px; padding:10px 22px;
-         font-weight:700; cursor:pointer; text-decoration:none; font-family:inherit; font-size:16px; }
-  .btn:hover { background:#FFD966; }
-  .btn.sec { background:var(--celeste); border-color:var(--celeste2); }
-  input[type=text] { padding:9px 12px; border:1px solid var(--celeste2); border-radius:999px; font-family:inherit; font-size:15px; }
-  a { color:#2A6FA8; }
-  .Alta { color:#C0392B; font-weight:700; } .Media { color:#9A6B00; font-weight:700; }
-  .ayuda { color:var(--gris); font-size:14px; }
-  ul.limpia { list-style:none; margin:0; padding:0; } ul.limpia li { padding:8px 0; border-top:1px solid var(--borde); } ul.limpia li:first-child { border-top:0; }
-</style>
+<title>{% block titulo %}Transparenta{% endblock %} · Transparenta</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap.min.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap-icons.min.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
 </head>
 <body>
-<header><div class="barra">
-  <a href="{{ url_for('inicio') }}"><img src="{{ url_for('static', filename='logo.png') }}" alt="Transparenta"></a>
-  <nav>
-    <a href="{{ url_for('inicio') }}" class="{{ 'activo' if request.endpoint == 'inicio' }}">Inicio</a>
-    <a href="{{ url_for('registro') }}" class="{{ 'activo' if request.endpoint in ('registro','detalle') }}">Registro</a>
-    <a href="{{ url_for('bitacora') }}" class="{{ 'activo' if request.endpoint == 'bitacora' }}">Bitácora</a>
+{% set g_datos = ep in ('registro','detalle','nuevo') %}
+{% set g_seg = ep in ('plazos','bitacora') %}
+{% set g_ayuda = ep in ('como','semaforo','ley') %}
+<header class="topbar">
+  <button class="burger" id="burger" aria-label="Mostrar u ocultar el menú"><i class="bi bi-list"></i></button>
+  <a class="logo" href="{{ url_for('inicio') }}" title="Volver al Inicio">
+    <svg width="46" height="46" viewBox="0 0 48 48" aria-hidden="true"><circle cx="20" cy="20" r="12" fill="#D6EEFA" stroke="#7CC4E6" stroke-width="4"/><path d="M29 29l11 11" stroke="#F7C948" stroke-width="5" stroke-linecap="round"/><path d="M15 18h10M15 23h6" stroke="#7CC4E6" stroke-width="3" stroke-linecap="round"/><path d="M38 6l1.6 4 4 1.6-4 1.6L38 17l-1.6-3.8-4-1.6 4-1.6z" fill="#F7C948"/></svg>
+    <b>Transparenta</b></a>
+  <div class="rolsel"><span class="muted">Estás viendo como:</span>
+    <div class="dropdown"><button class="btn dropdown-toggle" data-bs-toggle="dropdown">{% if rol=='area' %}Responsable de Área · {{ area_actual.nombre }}{% else %}Coordinación de Cumplimiento{% endif %}</button>
+      <ul class="dropdown-menu dropdown-menu-end">
+        <li><a class="dropdown-item {{ 'active' if rol=='coord' }}" href="{{ url_for('cambiar_rol', r='coord') }}">Coordinación de Cumplimiento</a></li>
+        <li><hr class="dropdown-divider"></li>
+        {% for a in areas_menu %}<li><a class="dropdown-item {{ 'active' if rol=='area' and area_actual.id==a.id }}" href="{{ url_for('cambiar_rol', r='area', area=a.id) }}">Responsable de Área · {{ a.nombre }}</a></li>{% endfor %}
+      </ul></div></div>
+</header>
+<div class="cuerpo">
+  <nav class="side" id="side" aria-label="Menú principal">
+    <a class="nv {{ 'on' if ep=='inicio' }}" href="{{ url_for('inicio') }}"><i class="bi bi-house"></i>Inicio</a>
+    <button class="sec {{ '' if True else 'collapsed' }}" data-bs-toggle="collapse" data-bs-target="#m-datos" aria-expanded="true">MIS DATOS<i class="bi bi-chevron-up"></i></button>
+    <div class="collapse show" id="m-datos">
+      <a class="nv {{ 'on' if ep in ('registro','detalle') }}" href="{{ url_for('registro') }}"><i class="bi bi-journal-text"></i>Ver Registro</a>
+      <a class="nv {{ 'on' if ep=='nuevo' }}" href="{{ url_for('nuevo') }}"><i class="bi bi-plus-circle"></i>Nuevo Registro</a></div>
+    <button class="sec" data-bs-toggle="collapse" data-bs-target="#m-seg" aria-expanded="true">SEGUIMIENTO<i class="bi bi-chevron-up"></i></button>
+    <div class="collapse show" id="m-seg">
+      <a class="nv {{ 'on' if ep=='plazos' }}" href="{{ url_for('plazos') }}"><i class="bi bi-clock-history"></i>Plazos de Conservación</a>
+      <a class="nv {{ 'on' if ep=='bitacora' }}" href="{{ url_for('bitacora') }}"><i class="bi bi-file-earmark-text"></i>Bitácora de Decisiones</a></div>
+    <button class="sec" data-bs-toggle="collapse" data-bs-target="#m-ayuda" aria-expanded="true">AYUDA<i class="bi bi-chevron-up"></i></button>
+    <div class="collapse show" id="m-ayuda">
+      <a class="nv {{ 'on' if ep=='como' }}" href="{{ url_for('como') }}"><i class="bi bi-question-circle"></i>Cómo Funciona</a>
+      <a class="nv {{ 'on' if ep=='semaforo' }}" href="{{ url_for('semaforo_ayuda') }}"><i class="bi bi-stoplights"></i>Significado del Semáforo</a>
+      <a class="nv {{ 'on' if ep=='ley' }}" href="{{ url_for('ley') }}"><i class="bi bi-bank"></i>Qué Exige la Ley</a></div>
+    <div class="ayuda"><b>¿Tienes dudas?</b><br>Entra a <a href="{{ url_for('como') }}"><b>Cómo Funciona</b></a>: explica cada paso con un ejemplo.</div>
   </nav>
-</div></header>
-<main>{% block contenido %}{% endblock %}</main>
+  <main class="contenido">
+    <div class="migas">Nexa Soluciones TI · datos ficticios</div>
+    {% block contenido %}{% endblock %}
+    <div class="pie"><i class="bi bi-shield-check"></i> Transparenta es un Apoyo para cumplir la Ley N°&nbsp;21.719 sobre Protección y Tratamiento de Datos Personales. Las reglas del sistema no reemplazan el Análisis Jurídico: cada Decisión la confirma una persona. <a href="{{ url_for('ley') }}">Ver qué exige la Ley</a></div>
+  </main>
+</div>
+<script src="{{ url_for('static', filename='vendor/bootstrap.bundle.min.js') }}"></script>
+<script>
+document.getElementById('burger').onclick=()=>document.getElementById('side').classList.toggle('cerrado');
+if(window.innerWidth<992)document.getElementById('side').classList.add('cerrado');
+</script>
+{% block scripts %}{% endblock %}
 </body>
 </html>

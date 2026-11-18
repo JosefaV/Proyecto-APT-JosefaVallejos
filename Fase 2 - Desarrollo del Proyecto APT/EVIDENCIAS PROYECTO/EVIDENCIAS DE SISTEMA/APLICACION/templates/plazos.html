@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block titulo %}Plazos de Conservación{% endblock %}
+{% block contenido %}
+<h1>Plazos de Conservación</h1><div class="muted fs-5 mb-3">Cuándo corresponde borrar los datos que ya no se necesitan.</div>
+<div class="ley mb-3"><i class="bi bi-journal-check"></i> <b>Ley N°&nbsp;21.719:</b> los Datos Personales solo pueden conservarse por el tiempo necesario para su Finalidad. Después, se suprimen.</div>
+<div class="tarjeta py-2">
+{% for f in filas %}<div class="fila"><i class="bi bi-clock fs-5"></i>
+ <span class="flex-fill"><a class="fw-bold text-decoration-none" style="color:var(--marino)" href="{{ url_for('detalle', tid=f.t.id) }}">{{ f.t.actividad|titulo }}</a><br><span class="muted small">{{ f.t.area_nombre }} · Supresión el {{ f.supresion.strftime('%d-%m-%Y') }}</span></span>
+ {% if f.dias < 0 %}<span class="pastilla" style="background:#FFE9E7">Venció hace {{ -f.dias }} días</span>{% elif f.dias <= 30 %}<span class="pastilla" style="background:#FFF3C4">En {{ f.dias }} días</span>{% else %}<span class="pastilla" style="background:#E9F7EF">En {{ f.dias }} días</span>{% endif %}</div>
+{% else %}<div class="fila muted">No hay Plazos definidos.</div>{% endfor %}
+</div>
+{% endblock %}

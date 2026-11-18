@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS tratamiento (
     finalidad           TEXT,
     categoria_dato      TEXT NOT NULL CHECK (categoria_dato IN ('Común','Económico','Sensible','Geolocalización')),
     detalle_datos       TEXT,
-    grupo_titular       TEXT NOT NULL CHECK (grupo_titular IN ('Empleados','Empleados Externos','Proveedores','Clientes','Postulantes')),
+    grupo_titular       TEXT NOT NULL CHECK (grupo_titular IN ('Empleados','Empleados Externos','Proveedores','Clientes','Postulantes','Familiares de Empleados')),
     titulares           TEXT NOT NULL CHECK (titulares IN ('Adultos','Adolescentes (14-17)','Niños y niñas (<14)')),
     base_licitud        TEXT CHECK (base_licitud IN ('Consentimiento','Contrato','Obligación legal','Interés legítimo','Obligación económica','Defensa de derechos') OR base_licitud IS NULL),
     origen              TEXT,

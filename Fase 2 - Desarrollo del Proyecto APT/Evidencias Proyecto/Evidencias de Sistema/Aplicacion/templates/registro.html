@@ -1,24 +1,28 @@
 {% extends "base.html" %}
+{% block titulo %}Ver Registro{% endblock %}
 {% block contenido %}
-<h1>Registro de Tratamientos</h1>
-<p class="sub">Los tratamientos en rojo aparecen primero. Haz clic en una actividad para ver sus brechas y decidir.</p>
-<div class="fila">
-  <div class="tarjeta"><span class="luz rojo"></span>Rojo<b>{{ cuenta.rojo }}</b></div>
-  <div class="tarjeta"><span class="luz amarillo"></span>Amarillo<b>{{ cuenta.amarillo }}</b></div>
-  <div class="tarjeta"><span class="luz verde"></span>Verde<b>{{ cuenta.verde }}</b></div>
+<div class="d-flex justify-content-between align-items-end flex-wrap gap-2 mb-3">
+  <div><h1>Registro de Tratamientos</h1><div class="muted fs-5">Todo lo que tu empresa hace con Datos Personales. Los Tratamientos en rojo van primero.</div></div>
+  <a class="btn btn-banana" href="{{ url_for('nuevo') }}"><i class="bi bi-plus-lg"></i> Nuevo Registro</a>
 </div>
-<table>
-  <tr><th>Estado</th><th>Actividad</th><th>Área</th><th>Categoría</th><th>Base de licitud</th><th>Supresión</th><th>Brechas</th></tr>
-  {% for f in filas %}
-  <tr>
-    <td><span class="luz {{ f.semaforo }}"></span></td>
-    <td><a href="{{ url_for('detalle', tid=f.t.id) }}">{{ f.t.actividad }}</a></td>
-    <td>{{ f.t.area_nombre }}</td>
-    <td>{{ f.t.categoria_dato }}</td>
-    <td>{{ f.t.base_licitud or '—' }}</td>
-    <td>{% if f.supresion %}{{ f.supresion.strftime('%d-%m-%Y') }}{% else %}—{% endif %}</td>
-    <td>{{ f.brechas|length }}</td>
-  </tr>
-  {% endfor %}
-</table>
+<div class="ley mb-3"><i class="bi bi-journal-check"></i> <b>Ley N°&nbsp;21.719:</b> este Registro es la base para demostrar qué datos se tratan, con qué fin y con qué Derecho.</div>
+{% if rol=='coord' %}
+<div class="d-flex flex-wrap gap-2 align-items-center mb-2"><b class="me-1">Área</b>
+  <a class="btn btn-sm {{ 'btn-dark' if not area_id else 'btn-borde' }}" href="{{ url_for('registro', estado=estado) }}">Todas</a>
+  {% for a in areas %}<a class="btn btn-sm {{ 'btn-dark' if area_id==a.id else 'btn-borde' }}" href="{{ url_for('registro', area=a.id, estado=estado) }}">{{ a.nombre }}</a>{% endfor %}</div>
+{% endif %}
+<div class="d-flex flex-wrap gap-2 align-items-center mb-3"><b class="me-1">Estado</b>
+  <a class="btn btn-sm {{ 'btn-dark' if not estado else 'btn-borde' }}" href="{{ url_for('registro', area=area_id) }}">Todos</a>
+  <a class="btn btn-sm {{ 'btn-dark' if estado=='rojo' else 'btn-borde' }}" href="{{ url_for('registro', area=area_id, estado='rojo') }}"><span class="luz rojo"></span> Rojo ({{ cuenta.rojo }})</a>
+  <a class="btn btn-sm {{ 'btn-dark' if estado=='amarillo' else 'btn-borde' }}" href="{{ url_for('registro', area=area_id, estado='amarillo') }}"><span class="luz amarillo"></span> Amarillo ({{ cuenta.amarillo }})</a>
+  <a class="btn btn-sm {{ 'btn-dark' if estado=='verde' else 'btn-borde' }}" href="{{ url_for('registro', area=area_id, estado='verde') }}"><span class="luz verde"></span> Verde ({{ cuenta.verde }})</a></div>
+<div class="tarjeta py-2">
+{% for f in filas %}
+  <div class="fila"><span class="luz {{ f.semaforo }}"></span>
+    <span style="flex:1.6"><a class="fw-bold text-decoration-none" style="color:var(--marino)" href="{{ url_for('detalle', tid=f.t.id) }}">{{ f.t.actividad|titulo }}</a><br><span class="muted small">{{ f.t.categoria_dato }} · {{ f.t.base_licitud|titulo or 'Sin Base de Licitud' }}</span></span>
+    <span class="pastilla d-none d-md-inline" style="background:#E8F5FC">{{ f.t.area_nombre }}</span>
+    <span class="pastilla" style="background:{{ '#FFE9E7' if f.semaforo=='rojo' else '#FFF8DB' if f.semaforo=='amarillo' else '#E9F7EF' }}">{{ f.brechas|length }} Brechas</span>
+    <a class="btn btn-borde btn-sm" href="{{ url_for('detalle', tid=f.t.id) }}">Abrir</a></div>
+{% else %}<div class="fila muted">No hay Tratamientos con este filtro.</div>{% endfor %}
+</div>
 {% endblock %}

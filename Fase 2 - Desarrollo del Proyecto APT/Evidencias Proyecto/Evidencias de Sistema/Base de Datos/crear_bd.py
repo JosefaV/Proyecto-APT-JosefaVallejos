@@ -47,9 +47,9 @@ TRATAMIENTOS = [
     (1, "Exámenes preocupacionales", "Verificar aptitud para el cargo", "Sensible",
      "Resultados de salud ocupacional", "Empleados", "Adultos", "Obligación legal",
      "Mutual de seguridad", "Camila Rojas", 120, 300, None, "Cifrado en disco", "Camila Rojas", 90),
-    (1, "Práctica profesional de adolescentes", "Gestionar prácticas de estudiantes", "Común",
-     "Nombre, edad, colegio", "Empleados", "Adolescentes (14-17)", "Interés legítimo",  # menor sin consentimiento -> brecha
-     "Convenio con liceo", "Camila Rojas", 12, 200, None, "Acceso restringido", None, None),
+    (1, "Taller de verano para hijos e hijas de colaboradores", "Organizar actividades recreativas", "Común",
+     "Nombre, edad, contacto del apoderado", "Familiares de Empleados", "Niños y niñas (<14)", "Interés legítimo",  # niños <14 sin consentimiento -> brecha Alta
+     "Inscripción en RRHH", "Camila Rojas", 12, 200, None, "Acceso restringido", None, None),
     (2, "Pago de remuneraciones", "Pagar sueldos y cotizaciones", "Económico",
      "Cuenta bancaria, sueldo", "Empleados", "Adultos", "Obligación legal",
      "Contrato de trabajo", "Diego Fuentes", 72, 600, 2, "Transferencia cifrada", "Diego Fuentes", 20),
@@ -79,9 +79,9 @@ TRATAMIENTOS = [
 BITACORA = [  # (dias_atras, usuario, accion, tratamiento_id, detalle)
     (30, "Camila Rojas", "Revisión", 1, "Registro revisado y confirmado."),
     (20, "Diego Fuentes", "Revisión", 5, "Registro revisado y confirmado."),
-    (15, "Diego Fuentes", "Revisión", 7, "Registro revisado; se detecta plazo próximo a vencer."),
+    (15, "Diego Fuentes", "Revisión", 7, "Registro revisado; se detecta Plazo próximo a vencer."),
     (10, "Valentina Soto", "Revisión", 9, "Registro revisado y confirmado."),
-    (5, "Matías Araya", "Alta", 11, "Se registra el tratamiento de geolocalización de vehículos."),
+    (5, "Matías Araya", "Alta", 11, "Se registra el Tratamiento «Geolocalización de Vehículos»."),
 ]
 
 # ---------------------------------------------------------------- creación

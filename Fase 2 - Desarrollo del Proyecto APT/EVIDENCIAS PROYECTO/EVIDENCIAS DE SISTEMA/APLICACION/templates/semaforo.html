@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block titulo %}Significado del Semáforo{% endblock %}
+{% block contenido %}
+<h1>Significado del Semáforo</h1><div class="muted fs-5 mb-4">Cada Tratamiento recibe un color según lo que le falta para cumplir la Ley N°&nbsp;21.719.</div>
+<div class="row g-3">
+ <div class="col-md-4"><div class="tarjeta rosa h-100"><span class="luz rojo" style="width:20px;height:20px"></span><h2 class="mt-2">Rojo</h2><p><b>Hay al menos una Brecha Alta.</b></p><p class="mb-0">Ejemplos: falta la Base de Licitud, un Plazo de Conservación vencido o datos de Niños y Niñas sin Consentimiento de sus padres. Conviene resolverlo primero.</p></div></div>
+ <div class="col-md-4"><div class="tarjeta van h-100"><span class="luz amarillo" style="width:20px;height:20px"></span><h2 class="mt-2">Amarillo</h2><p><b>Solo hay Brechas Medias.</b></p><p class="mb-0">Ejemplos: un Tercero sin Contrato vigente, un Plazo que vence pronto o una Revisión humana pendiente.</p></div></div>
+ <div class="col-md-4"><div class="tarjeta menta h-100"><span class="luz verde" style="width:20px;height:20px"></span><h2 class="mt-2">Verde</h2><p><b>No hay Brechas.</b></p><p class="mb-0">El Tratamiento cumple con las reglas del sistema y fue revisado por una persona.</p></div></div>
+</div>
+<div class="ley mt-4"><i class="bi bi-info-circle"></i> El Semáforo es un Apoyo para ordenar el trabajo. No reemplaza el Análisis Jurídico.</div>
+{% endblock %}
