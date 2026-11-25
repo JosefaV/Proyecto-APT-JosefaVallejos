@@ -2,10 +2,10 @@
 {% block titulo %}Ver Registro{% endblock %}
 {% block contenido %}
 <div class="d-flex justify-content-between align-items-end flex-wrap gap-2 mb-3">
-  <div><h1>Registro de Tratamientos</h1><div class="muted fs-5">Todo lo que tu empresa hace con Datos Personales. Los Tratamientos en rojo van primero.</div></div>
+  <div><h1>Registro de Tratamientos</h1><div class="muted fs-5">Tratamientos de Datos Personales de la empresa. Se muestran primero los de estado rojo.</div></div>
   <a class="btn btn-banana" href="{{ url_for('nuevo') }}"><i class="bi bi-plus-lg"></i> Nuevo Registro</a>
 </div>
-<div class="ley mb-3"><i class="bi bi-journal-check"></i> <b>Ley N°&nbsp;21.719:</b> este Registro es la base para demostrar qué datos se tratan, con qué fin y con qué Derecho.</div>
+<div class="ley mb-3"><i class="bi bi-journal-check"></i> <b>Ley N°&nbsp;21.719:</b> este Registro permite demostrar qué datos se tratan, con qué finalidad y bajo qué Base de Licitud.</div>
 {% if rol=='coord' %}
 <div class="d-flex flex-wrap gap-2 align-items-center mb-2"><b class="me-1">Área</b>
   <a class="btn btn-sm {{ 'btn-dark' if not area_id else 'btn-borde' }}" href="{{ url_for('registro', estado=estado) }}">Todas</a>
@@ -23,6 +23,6 @@
     <span class="pastilla d-none d-md-inline" style="background:#E8F5FC">{{ f.t.area_nombre }}</span>
     <span class="pastilla" style="background:{{ '#FFE9E7' if f.semaforo=='rojo' else '#FFF8DB' if f.semaforo=='amarillo' else '#E9F7EF' }}">{{ f.brechas|length }} Brechas</span>
     <a class="btn btn-borde btn-sm" href="{{ url_for('detalle', tid=f.t.id) }}">Abrir</a></div>
-{% else %}<div class="fila muted">No hay Tratamientos con este filtro.</div>{% endfor %}
+{% else %}<div class="fila muted">No existen Tratamientos para el filtro seleccionado.</div>{% endfor %}
 </div>
 {% endblock %}

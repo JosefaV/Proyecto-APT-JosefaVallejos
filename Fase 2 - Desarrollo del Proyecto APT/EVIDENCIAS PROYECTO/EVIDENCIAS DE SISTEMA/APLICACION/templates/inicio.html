@@ -1,55 +1,15 @@
 {% extends "base.html" %}
+{% from "_ciclo.html" import tarjetas %}
 {% block titulo %}Inicio{% endblock %}
 {% block contenido %}
-<h1>{% if rol=='area' %}Inicio · Hola, {{ area_actual.responsable }}{% else %}Inicio{% endif %}</h1>
-<p class="muted mb-3">
-  {% if rol=='area' %}Estos son los Datos Personales que trata el área de <b>{{ area_actual.nombre }}</b> y lo que falta para cumplir la Ley N°&nbsp;21.719.
-  {% else %}Estos son los Datos Personales que tratan las 4 áreas de la empresa y lo que falta para cumplir la Ley N°&nbsp;21.719.{% endif %}</p>
-
-<div class="tarjeta celeste mb-4">
-  <b>Para qué sirve Transparenta:</b> la Ley N°&nbsp;21.719 exige saber y poder demostrar <b>qué Datos Personales se tratan, para qué, con qué Derecho y por cuánto tiempo</b>. Aquí se ordena esa información y se revisa cada Tratamiento contra la Ley, para corregir a tiempo lo que falte.
-  <a class="fw-bold" href="{{ url_for('ley') }}">Ver qué exige la Ley</a>
-</div>
-
-<div class="row g-3 mb-4">
-  <div class="col-md-4"><a href="{{ url_for('registro', estado='rojo') }}" class="text-decoration-none"><div class="tarjeta rosa h-100"><div class="num">{{ cuenta.rojo }}</div><span class="luz rojo"></span> <b>Requieren Acción</b><div class="muted small">de {{ total }} Tratamientos, con Brechas graves</div></div></a></div>
-  <div class="col-md-4"><a href="{{ url_for('registro', estado='amarillo') }}" class="text-decoration-none"><div class="tarjeta van kpi h-100"><div class="num">{{ cuenta.amarillo }}</div><span class="luz amarillo"></span> <b>Por Revisar</b><div class="muted small">con avisos menores</div></div></a></div>
-  <div class="col-md-4"><a href="{{ url_for('registro', estado='verde') }}" class="text-decoration-none"><div class="tarjeta menta h-100"><div class="num">{{ cuenta.verde }}</div><span class="luz verde"></span> <b>En Orden</b><div class="muted small">sin Brechas</div></div></a></div>
-</div>
-
-<div class="row g-4">
-  <section class="col-lg-7">
-    <h2 class="mb-0">Para Atender</h2><div class="muted mb-1">Hoy · {{ hoy_texto }}. Empieza por los Tratamientos con más Brechas.</div>
-    <div>
-    {% for f in urgentes[:4] %}
-    <div class="fila" style="align-items:flex-start"><span class="d-flex align-items-center justify-content-center flex-none" style="width:44px;height:44px;border:2px solid var(--marino);border-radius:6px"><i class="bi bi-exclamation-triangle fs-5"></i></span>
-      <span class="flex-fill" style="border-left:3px solid var(--azul);padding-left:14px"><b>{{ f.t.actividad|titulo }}</b><br><span class="muted small">{{ f.t.area_nombre }} · {{ f.brechas|length }} Brechas</span></span>
-      <a class="btn btn-borde btn-sm" href="{{ url_for('detalle', tid=f.t.id) }}">Revisar</a></div>
-    {% else %}<div class="fila"><span class="luz verde"></span><span>No hay Tratamientos en rojo. ¡Buen trabajo!</span></div>{% endfor %}
-    </div>
-    <div class="mt-2 d-flex gap-2 flex-wrap"><a class="btn btn-banana" href="{{ url_for('nuevo') }}"><i class="bi bi-plus-lg"></i> Registrar un Tratamiento</a><a class="btn btn-borde" href="{{ url_for('registro') }}">Ver todo el Registro</a></div>
-  </section>
-  <section class="col-lg-5">
-    {% if rol=='coord' %}
-    <h2 class="mb-0">Estado por Área</h2><div class="muted mb-1">Cada área responde por sus propios datos.</div>
-    {% for p in por_area %}
-    <div class="fila" style="flex-wrap:wrap"><div style="flex:1 1 140px"><b>{{ p.area.nombre }}</b><br><span class="muted small">Responsable: {{ p.area.responsable }}</span></div>
-      <div class="d-flex flex-fill overflow-hidden" style="height:12px;background:#EEF3F8;min-width:110px;border-radius:3px">
-        {% if p.total %}<div style="width:{{ p.rojo/p.total*100 }}%;background:var(--rojo)"></div><div style="width:{{ p.amarillo/p.total*100 }}%;background:var(--amar)"></div><div style="width:{{ p.verde/p.total*100 }}%;background:var(--verde)"></div>{% endif %}</div></div>
-    {% endfor %}
-    {% else %}
-    <h2 class="mb-0">Plazos que Vencen</h2><div class="muted mb-1">Cuándo corresponde suprimir datos de tu área.</div>
-    {% for f in por_vencer[:3] %}<div class="fila"><i class="bi bi-clock fs-5"></i><span class="flex-fill"><b>{{ f.t.actividad|titulo }}</b><br><span class="muted small">Supresión el {{ f.supresion.strftime('%d-%m-%Y') }}</span></span><span class="pastilla" style="background:#FFF3C4">En {{ f.dias }} días</span></div>
-    {% else %}<div class="fila muted">No hay Plazos por vencer en los próximos 60 días.</div>{% endfor %}
-    <a class="fw-bold" href="{{ url_for('plazos') }}">Ver todos los Plazos →</a>
-    {% endif %}
-  </section>
-</div>
-
-<h2 class="mt-4 mb-2">Cómo Funciona, en 4 Pasos</h2>
-<div class="row g-3">
-  {% for n,t,s in [(1,'Registra','Anota cada actividad que usa Datos Personales.'),(2,'Revisa','El sistema marca un Semáforo según la Ley.'),(3,'Resuelve','Tú decides qué hacer con cada Brecha, una por una.'),(4,'Confirma','Tu Decisión queda en la Bitácora.')] %}
-  <div class="col-sm-6 col-xl-3"><div class="d-flex gap-3 align-items-start"><span class="paso-n">{{ n }}</span><div><b>{{ t }}</b><div class="muted">{{ s }}</div></div></div></div>
-  {% endfor %}
-</div>
+<section class="hero">
+  <div class="marca"><svg width="84" height="84" viewBox="0 0 48 48" aria-hidden="true"><circle cx="20" cy="20" r="12" fill="#D6EEFA" stroke="#7CC4E6" stroke-width="4"/><path d="M29 29l11 11" stroke="#F7C948" stroke-width="5" stroke-linecap="round"/><path d="M15 18h10M15 23h6" stroke="#7CC4E6" stroke-width="3" stroke-linecap="round"/><path d="M38 6l1.6 4 4 1.6-4 1.6L38 17l-1.6-3.8-4-1.6 4-1.6z" fill="#F7C948"/></svg><b>Transparenta</b></div>
+  <div class="lema">Cada Dato Personal, bajo control durante todo su ciclo de vida.</div>
+  <div class="sub">Registro de Tratamientos, alertas de Conservación y Supresión, y Decisiones confirmadas por una persona, conforme a la Ley N°&nbsp;21.719.</div>
+  <div class="acc"><a class="btn btn-banana" href="{{ url_for('nuevo') }}"><i class="bi bi-plus-lg"></i> Registrar un Tratamiento</a>
+    <a class="btn btn-borde" href="{{ url_for('informe') }}"><i class="bi bi-clipboard-data"></i> Ver Informe de Seguimiento</a></div>
+</section>
+<h2 class="mb-1">Ciclo de Vida de los Datos Personales</h2>
+<div class="muted mb-2">{% if rol=='area' %}Área de {{ area_actual.nombre }}. {% endif %}Cada etapa detalla el fundamento legal y el estado de los Tratamientos.</div>
+{{ tarjetas(ciclo) }}
 {% endblock %}

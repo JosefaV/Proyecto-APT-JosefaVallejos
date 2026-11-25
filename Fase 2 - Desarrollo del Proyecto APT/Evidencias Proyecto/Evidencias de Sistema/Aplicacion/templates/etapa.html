@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% from "_ciclo.html" import chip %}
+{% block titulo %}{{ e.n }}. {{ e.nombre }}{% endblock %}
+{% block contenido %}
+<div class="eti mb-1">Ciclo de Vida de los Datos · Etapa {{ e.n }} de 5</div>
+<h1><i class="bi {{ e.icono }}"></i> {{ e.n }}. {{ e.nombre }}</h1>
+<div class="muted fs-5 mb-3">{{ e.pregunta }}</div>
+
+<div class="ruta mb-4">
+{% for x in etapas_menu %}<a class="ruta-p {{ 'act' if x.k==e.k }}" href="{{ url_for('etapa', clave=x.k) }}"><span class="nn">{{ x.n }}</span>{{ x.nombre }}</a>{% if not loop.last %}<i class="bi bi-chevron-right ruta-f"></i>{% endif %}{% endfor %}
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4"><div class="tarjeta celeste h-100"><div class="eti">Fundamento Legal</div>{{ e.ley }}</div></div>
+  <div class="col-md-4"><div class="tarjeta van h-100"><div class="eti">Control Aplicado por Transparenta</div>{{ e.revisa }}</div></div>
+  <div class="col-md-4"><div class="tarjeta menta h-100"><div class="eti">Acción del Responsable</div>{{ e.tu }}</div></div>
+</div>
+
+<h2 class="mb-1">Estado de cada Tratamiento en la Etapa</h2>
+<div class="muted mb-2">
+  <span class="luz rojo"></span> {{ cuenta.alerta }} con Acción Requerida · <span class="luz amarillo"></span> {{ cuenta.aviso }} por Revisar · <span class="luz verde"></span> {{ cuenta.ok }} en Orden{% if cuenta.info %} · {{ cuenta.info }} sin acciones en esta etapa{% endif %}</div>
+<div class="tarjeta p-0 mb-4" style="overflow-x:auto">
+<table class="tabla-inf">
+  <thead><tr><th>Tratamiento</th><th>Área</th><th>Estado en la Etapa</th><th></th></tr></thead>
+  <tbody>
+  {% for f in filas %}
+  <tr><td><b>{{ f.t.actividad|titulo }}</b><br><span class="muted small">{{ f.t.categoria_dato }}</span></td>
+      <td>{{ f.t.area_nombre }}</td>
+      <td>{{ chip(f.etapas[e.k]) }}</td>
+      <td class="text-end"><a class="btn btn-borde btn-sm" href="{{ url_for('detalle', tid=f.t.id) }}">{{ 'Resolver' if f.etapas[e.k][0] in ('alerta','aviso') else 'Ver' }}</a></td></tr>
+  {% else %}<tr><td colspan="4" class="muted">No hay Tratamientos.</td></tr>{% endfor %}
+  </tbody>
+</table></div>
+
+{% if e.k == 'suprimir' and suprimidos %}
+<h2 class="mb-1">Tratamientos Suprimidos</h2>
+<div class="tarjeta menta mb-4">{% for t in suprimidos %}<div><i class="bi bi-check-circle-fill text-success"></i> <b>{{ t.actividad|titulo }}</b> · {{ t.area_nombre }}</div>{% endfor %}</div>
+{% endif %}
+
+<div class="d-flex justify-content-between mt-4">
+  {% set i = e.n %}
+  {% if i > 1 %}<a class="btn btn-borde" href="{{ url_for('etapa', clave=etapas_menu[i-2].k) }}"><i class="bi bi-arrow-left"></i> {{ etapas_menu[i-2].nombre }}</a>{% else %}<span></span>{% endif %}
+  {% if i < 5 %}<a class="btn btn-banana" href="{{ url_for('etapa', clave=etapas_menu[i].k) }}">Siguiente: {{ etapas_menu[i].nombre }} <i class="bi bi-arrow-right"></i></a>{% else %}<a class="btn btn-banana" href="{{ url_for('informe') }}">Ver Informe de Seguimiento <i class="bi bi-arrow-right"></i></a>{% endif %}
+</div>
+{% endblock %}

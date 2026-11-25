@@ -1,38 +1,42 @@
 {% extends "base.html" %}
+{% from "_ciclo.html" import chip %}
 {% block titulo %}{{ t.actividad|titulo }}{% endblock %}
 {% block contenido %}
 {% if es_nuevo %}
 <div class="text-center mx-auto mb-4" style="max-width:760px"><span class="d-inline-flex align-items-center justify-content-center rounded-circle" style="width:76px;height:76px;background:#E9F7EF;font-size:38px"><i class="bi bi-check-lg" style="color:#2E8B57"></i></span>
-  <h1 class="mt-2">¡Tratamiento registrado!</h1>
-  <div class="muted fs-5">«{{ t.actividad|titulo }}» quedó guardado en el Registro de Tratamientos y anotado en la Bitácora de Decisiones.</div>
-  <div class="mt-3">{% if brechas %}El sistema lo revisó contra la Ley N°&nbsp;21.719 y encontró <b>{{ brechas|length }} Brecha{{ 's' if brechas|length>1 }}</b>. Aquí abajo ves qué hacer con cada una.{% else %}El sistema lo revisó contra la Ley N°&nbsp;21.719 y no encontró Brechas.{% endif %}</div></div>
+  <h1 class="mt-2">¡Tratamiento Registrado!</h1>
+  <div class="muted fs-5">«{{ t.actividad|titulo }}» fue guardado en el Registro de Tratamientos y anotado en la Bitácora de Decisiones.</div>
+  <div class="mt-3">{% if brechas %}El sistema contrastó el Tratamiento con la Ley N°&nbsp;21.719 y detectó <b>{{ brechas|length }} Brecha{{ 's' if brechas|length>1 }}</b>. A continuación se detalla la acción correctiva para cada una.{% else %}El sistema contrastó el Tratamiento con la Ley N°&nbsp;21.719 y no detectó Brechas.{% endif %}</div></div>
 {% endif %}
 <a class="btn btn-borde mb-3" href="{{ url_for('registro') }}"><i class="bi bi-arrow-left"></i> Volver al Registro</a>
 <div class="d-flex align-items-center gap-3 flex-wrap"><span class="luz {{ semaforo }}" style="width:20px;height:20px"></span><h1 class="mb-0">{{ t.actividad|titulo }}</h1>
-  <span class="pastilla" style="font-size:15px;background:{{ '#FFE9E7' if semaforo=='rojo' else '#FFF8DB' if semaforo=='amarillo' else '#E9F7EF' }}">{{ 'Requiere atención' if semaforo=='rojo' else 'Por revisar' if semaforo=='amarillo' else 'En orden' }}</span></div>
+  <span class="pastilla" style="font-size:15px;background:{{ '#FFE9E7' if semaforo=='rojo' else '#FFF8DB' if semaforo=='amarillo' else '#E9F7EF' }}">{{ 'Requiere Acción' if semaforo=='rojo' else 'Por Revisar' if semaforo=='amarillo' else 'En Orden' }}</span></div>
 <div class="muted fs-5 mb-4">{{ t.area_nombre }} · Responsable: {{ t.responsable|titulo }}</div>
+<div class="recorrido mb-4">
+{% for e in etapas_menu %}<a class="rec {{ et[e.k][0] }}" href="{{ url_for('etapa', clave=e.k) }}"><span class="eti">{{ e.n }}. {{ e.nombre }}</span>{{ chip(et[e.k]) }}</a>{% endfor %}
+</div>
 <div class="row g-3">
  <div class="col-lg-8 d-flex flex-column gap-3">
   <section class="tarjeta"><h2>Datos del Tratamiento</h2>
    <div class="row g-3">
-    {% for k,v in [('Finalidad',t.finalidad),('Tipo de Datos', t.categoria_dato ~ (' · ' ~ t.detalle_datos if t.detalle_datos else '')),('De Quién Son los Datos', t.grupo_titular ~ ' · ' ~ t.titulares|titulo),('Base de Licitud', t.base_licitud|titulo or 'Sin definir'),('Origen', t.origen or '—'),('Tercero', t.tercero_nombre or 'Ninguno'),('Plazo', (t.plazo_meses ~ ' meses' if t.plazo_meses else 'Sin definir') ~ (' (Supresión ' ~ supresion.strftime('%d-%m-%Y') ~ ')' if supresion else '')),('Última Revisión', (t.revisado_por|titulo ~ ' · ' ~ t.fecha_revision|fecha) if t.revisado_por else 'Pendiente')] %}
+    {% for k,v in [('Finalidad del Tratamiento',t.finalidad),('Categoría de Datos Personales', t.categoria_dato ~ (' · ' ~ t.detalle_datos if t.detalle_datos else '')),('Categoría de Titulares', t.grupo_titular ~ ' · ' ~ t.titulares),('Base de Licitud', t.base_licitud|titulo or 'Sin Definir'),('Origen de los Datos', t.origen or '—'),('Tercero Receptor', t.tercero_nombre or 'Ninguno'),('Plazo de Conservación', (t.plazo_meses ~ ' Meses' if t.plazo_meses else 'Sin Definir') ~ (' (Supresión: ' ~ supresion.strftime('%d-%m-%Y') ~ ')' if supresion else '')),('Medidas de Seguridad', t.medidas_seguridad or '—'),('Última Revisión', (t.revisado_por|titulo ~ ' · ' ~ t.fecha_revision|fecha) if t.revisado_por else 'Pendiente')] %}
     <div class="col-sm-6"><div class="eti">{{ k }}</div><div class="fw-bold">{{ v }}</div></div>{% endfor %}
    </div></section>
-  <section class="tarjeta"><h2 class="mb-1">Brechas Detectadas</h2><div class="muted mb-3">El sistema compara el Registro con la Ley N°&nbsp;21.719 y sugiere qué hacer.</div>
-   {% for g, texto in brechas %}<div class="brecha {{ g }}"><span class="pastilla p-{{ g|lower }} me-1">{{ g }}</span><b>{{ texto }}</b><div class="mt-1">Qué hacer: {{ que_hacer(texto) }}</div></div>
-   {% else %}<div class="brecha" style="background:var(--menta)"><b>No se detectaron Brechas.</b> Este Tratamiento cumple con las reglas del sistema.</div>{% endfor %}</section>
+  <section class="tarjeta"><h2 class="mb-1">Brechas de Cumplimiento Detectadas</h2><div class="muted mb-3">El sistema contrasta el Registro con la Ley N°&nbsp;21.719 y recomienda acciones correctivas.</div>
+   {% for g, texto in brechas %}<div class="brecha {{ g }}"><span class="pastilla p-{{ g|lower }} me-1">{{ g }}</span><b>{{ texto }}</b><div class="mt-1"><b>Acción Correctiva:</b> {{ que_hacer(texto) }}</div></div>
+   {% else %}<div class="brecha" style="background:var(--menta)"><b>No se detectaron Brechas.</b> El Tratamiento cumple las reglas de verificación del sistema.</div>{% endfor %}</section>
  </div>
  <div class="col-lg-4 d-flex flex-column gap-3">
-  <section class="tarjeta celeste"><h2 class="mb-1">Tu Decisión</h2><div class="muted mb-3">El sistema solo sugiere. Cada Decisión la confirma una persona y queda en la Bitácora.</div>
+  <section class="tarjeta celeste"><h2 class="mb-1">Decisión del Responsable</h2><div class="muted mb-3">El sistema solo recomienda. Cada Decisión es confirmada por una persona y queda registrada en la Bitácora de Decisiones.</div>
    <form method="post" action="{{ url_for('revisar', tid=t.id) }}" class="mb-2">
-    <input class="form-control mb-2" type="text" name="usuario" placeholder="Tu nombre" required aria-label="Tu nombre">
+    <input class="form-control mb-2" type="text" name="usuario" placeholder="Nombre del Responsable" required aria-label="Nombre del Responsable">
     <button class="btn btn-banana w-100">Confirmar Revisión</button></form>
-   <form method="post" action="{{ url_for('suprimir', tid=t.id) }}" onsubmit="return confirm('¿Confirmas que los datos fueron suprimidos?');">
-    <input class="form-control mb-2" type="text" name="usuario" placeholder="Tu nombre" required aria-label="Tu nombre">
+   <form method="post" action="{{ url_for('suprimir', tid=t.id) }}" onsubmit="return confirm('¿Se confirma que los datos fueron suprimidos?');">
+    <input class="form-control mb-2" type="text" name="usuario" placeholder="Nombre del Responsable" required aria-label="Nombre del Responsable">
     <button class="btn btn-borde w-100">Marcar como Suprimido</button></form></section>
   <section class="tarjeta"><h2>Historial</h2>
    {% for h in hist %}<div class="fila"><span class="luz" style="background:#7CC4E6"></span><span><b>{{ h.accion }}</b> · {{ h.usuario|titulo }}<br><span class="muted small">{{ h.fecha_hora|fecha }} · {{ h.detalle }}</span></span></div>
-   {% else %}<div class="muted">Sin acciones registradas.</div>{% endfor %}</section>
+   {% else %}<div class="muted">Sin acciones registradas en la Bitácora.</div>{% endfor %}</section>
  </div>
 </div>
 {% endblock %}

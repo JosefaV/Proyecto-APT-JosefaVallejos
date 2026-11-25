@@ -7,6 +7,7 @@ Qué hace en esta primera versión:
   /tratamiento/<id>       Detalle de un tratamiento, sus brechas y los botones de decisión
   /nuevo                  Formulario guiado para registrar un tratamiento nuevo
   /bitacora               Bitácora de acciones
+  /informe                Informe de seguimiento (imprimible / PDF)
 
 Idea clave: el software ORDENA, REVISA y RECUERDA, pero la persona DECIDE.
 Por eso confirmar una revisión o marcar una supresión son botones que SOLO se aplican
@@ -56,23 +57,23 @@ def analizar(t, hoy=None):
 
     # 1) Base de licitud: todo tratamiento debe tener una
     if not t["base_licitud"]:
-        brechas.append(("Alta", "Falta la Base de Licitud (Arts. 12 y 13)."))
+        brechas.append(("Alta", "El Tratamiento carece de Base de Licitud (Arts. 12 y 13)."))
         if t["categoria_dato"] == "Sensible":
-            brechas.append(("Alta", "Dato Sensible sin base que lo respalde (Arts. 2 g y 16)."))
+            brechas.append(("Alta", "Dato Sensible sin Base de Licitud que lo respalde (Arts. 2 g y 16)."))
 
     # 2) Niños, niñas y adolescentes (Art. 16 quáter)
     #    - Menores de 14 años: se espera el consentimiento de sus padres o representantes.
     #    - Adolescentes (14-17): los datos comunes se tratan como en un adulto; los datos sensibles
     #      de menores de 16 años requieren consentimiento de sus padres, por eso se pide verificar.
-    if t["titulares"] == "Niños y niñas (<14)" and t["base_licitud"] != "Consentimiento":
+    if t["titulares"] == MENOR14 and t["base_licitud"] != "Consentimiento":
         brechas.append(("Alta", "Datos de Niños y Niñas menores de 14 años sin Consentimiento de sus padres o representantes (Art. 16 quáter)."))
-    if t["titulares"] == "Adolescentes (14-17)" and t["categoria_dato"] == "Sensible" and t["base_licitud"] != "Consentimiento":
-        brechas.append(("Media", "Datos Sensibles de Adolescentes: verifica si hay menores de 16 años, que requieren Consentimiento de sus padres (Art. 16 quáter)."))
+    if t["titulares"] == ADOLESC and t["categoria_dato"] == "Sensible" and t["base_licitud"] != "Consentimiento":
+        brechas.append(("Media", "Datos Sensibles de Adolescentes: se debe verificar si existen menores de 16 años, quienes requieren el Consentimiento de sus padres o representantes (Art. 16 quáter)."))
 
     # 3) Terceros: contrato vigente y cláusula de supresión
     if t["tercero_id"]:
         if not t["contrato_vigente"]:
-            brechas.append(("Media", f"El Tercero «{t['tercero_nombre']}» no tiene Contrato vigente."))
+            brechas.append(("Media", f"El Tercero Receptor «{t['tercero_nombre']}» no tiene Contrato vigente."))
         if not t["clausula_supresion"]:
             brechas.append(("Media", f"El Contrato con «{t['tercero_nombre']}» no tiene Cláusula de Supresión."))
 
@@ -83,7 +84,7 @@ def analizar(t, hoy=None):
         dias = (supresion - hoy).days
         if not t["suprimido"]:
             if dias < 0:
-                brechas.append(("Alta", f"El Plazo de Conservación venció hace {-dias} días: corresponde suprimir."))
+                brechas.append(("Alta", f"El Plazo de Conservación venció hace {-dias} días: corresponde la Supresión."))
             elif dias <= 30:
                 brechas.append(("Media", f"El Plazo de Conservación vence en {dias} días."))
     else:
@@ -91,12 +92,86 @@ def analizar(t, hoy=None):
 
     # 5) Revisión humana pendiente
     if not t["revisado_por"]:
-        brechas.append(("Media", "Todavía no ha sido revisado por una persona."))
+        brechas.append(("Media", "El Tratamiento aún no cuenta con Revisión de una persona."))
 
     if any(g == "Alta" for g, _ in brechas): semaforo = "rojo"
     elif brechas: semaforo = "amarillo"
     else: semaforo = "verde"
     return brechas, semaforo, supresion, dias
+
+# ------------------------------------------------------------------ CICLO DE VIDA DE LOS DATOS
+# Cada tratamiento recorre 5 etapas. Para cada una el sistema indica: ok / aviso / alerta / info.
+ETAPAS = [
+ {"k": "recolectar", "n": 1, "nombre": "Recolectar", "icono": "bi-pencil-square",
+  "pregunta": "Identificar qué datos se solicitan, con qué finalidad y bajo qué Base de Licitud.",
+  "ley": "Todo tratamiento requiere una finalidad determinada y una Base de Licitud (por ejemplo, Contrato o Consentimiento). Los datos de niños, niñas y adolescentes están sujetos a reglas especiales (Art. 16 quáter).",
+  "revisa": "Que cada tratamiento cuente con finalidad, Base de Licitud y, cuando corresponda, el Consentimiento de los padres o representantes.",
+  "tu": "Registrar cada actividad que utilice Datos Personales y completar su Base de Licitud."},
+ {"k": "compartir", "n": 2, "nombre": "Usar y Compartir", "icono": "bi-people",
+  "pregunta": "Determinar quién utiliza los datos y con qué terceros se comparten.",
+  "ley": "Cuando un tercero (proveedor o encargado) trata los datos, debe existir un Contrato vigente que le exija resguardarlos y suprimirlos al término de la relación.",
+  "revisa": "Que cada Tercero Receptor tenga Contrato vigente y Cláusula de Supresión.",
+  "tu": "Solicitar o renovar el Contrato e incorporar la Cláusula de Supresión."},
+ {"k": "conservar", "n": 3, "nombre": "Conservar", "icono": "bi-clock-history",
+  "pregunta": "Establecer por cuánto tiempo se conservan los datos.",
+  "ley": "Los datos solo pueden conservarse durante el tiempo necesario para cumplir su finalidad.",
+  "revisa": "Que cada tratamiento tenga un Plazo de Conservación definido y se calcule el tiempo restante.",
+  "tu": "Definir el Plazo de Conservación en meses y monitorear los plazos próximos a vencer."},
+ {"k": "suprimir", "n": 4, "nombre": "Suprimir", "icono": "bi-trash3",
+  "pregunta": "Verificar la supresión de los datos una vez vencido el plazo.",
+  "ley": "Vencido el plazo, los datos deben suprimirse o anonimizarse.",
+  "revisa": "Qué tratamientos cumplieron su plazo y aún no han sido suprimidos.",
+  "tu": "Eliminar los datos y registrar la acción con Marcar como Suprimido, lo que queda en la Bitácora de Decisiones."},
+ {"k": "revisar", "n": 5, "nombre": "Revisar", "icono": "bi-person-check",
+  "pregunta": "Confirmar que una persona valida cada decisión.",
+  "ley": "La organización debe poder demostrar su cumplimiento (Responsabilidad Proactiva). Por ello, cada decisión es confirmada por una persona y queda registrada.",
+  "revisa": "Que cada tratamiento tenga una Revisión confirmada por una persona.",
+  "tu": "Abrir el tratamiento y presionar Confirmar Revisión."},
+]
+ETAPA_POR_K = {e["k"]: e for e in ETAPAS}
+ESTADO_ORDEN = {"alerta": 0, "aviso": 1, "ok": 2, "info": 3}
+
+def etapas_de(t, brechas, supresion, dias):
+    """Estado de las 5 etapas del ciclo de vida de un tratamiento: {clave: (estado, texto corto)}."""
+    r = {}
+    menores = any("16 quáter" in tx and g == "Alta" for g, tx in brechas)
+    if not t["base_licitud"]: r["recolectar"] = ("alerta", "Sin Base de Licitud")
+    elif menores: r["recolectar"] = ("alerta", "Sin Consentimiento de Padres o Representantes")
+    elif not t["finalidad"]: r["recolectar"] = ("aviso", "Sin Finalidad Definida")
+    else: r["recolectar"] = ("ok", "Base: " + titulo(t["base_licitud"]))
+    if t["tercero_id"]:
+        if not t["contrato_vigente"]: r["compartir"] = ("aviso", "Contrato no vigente: " + t["tercero_nombre"])
+        elif not t["clausula_supresion"]: r["compartir"] = ("aviso", "Contrato sin Cláusula de Supresión")
+        else: r["compartir"] = ("ok", "Contrato vigente: " + t["tercero_nombre"])
+    else: r["compartir"] = ("info", "Sin Terceros Receptores")
+    if t["suprimido"]: r["conservar"] = ("info", "Suprimido")
+    elif not t["plazo_meses"]: r["conservar"] = ("aviso", "Sin Plazo de Conservación")
+    elif dias < 0: r["conservar"] = ("alerta", f"Plazo vencido hace {-dias} días")
+    elif dias <= 30: r["conservar"] = ("aviso", f"Vence en {dias} días")
+    else: r["conservar"] = ("ok", "Vigente hasta el " + supresion.strftime("%d-%m-%Y"))
+    if t["suprimido"]: r["suprimir"] = ("ok", "Suprimido")
+    elif t["plazo_meses"] and dias < 0: r["suprimir"] = ("alerta", "Supresión Pendiente")
+    elif t["plazo_meses"] and dias <= 30: r["suprimir"] = ("aviso", "Supresión Próxima")
+    else: r["suprimir"] = ("info", "Plazo en Curso")
+    if t["revisado_por"]: r["revisar"] = ("ok", "Revisado por " + titulo(t["revisado_por"]))
+    else: r["revisar"] = ("aviso", "Pendiente de Revisión")
+    return r
+
+def resumen_ciclo(filas, suprimidos=0):
+    """Una tarjeta por etapa, con cuántos tratamientos están bien y cuántos necesitan atención."""
+    n = len(filas); out = []
+    for e in ETAPAS:
+        c = {x: sum(1 for f in filas if f["etapas"][e["k"]][0] == x) for x in ESTADO_ORDEN}
+        k = e["k"]
+        if k == "recolectar": txt = f"{c['ok']} de {n} con Base de Licitud y Finalidad"
+        elif k == "compartir":
+            con_t = c["ok"] + c["aviso"] + c["alerta"]
+            txt = f"{con_t} con Terceros Receptores · {c['aviso']} con Contrato por regularizar"
+        elif k == "conservar": txt = f"{c['alerta']} Plazos vencidos · {c['aviso']} por vencer"
+        elif k == "suprimir": txt = f"{c['alerta'] + c['aviso']} con Supresión pendiente · {suprimidos} suprimidos"
+        else: txt = f"{c['ok']} de {n} con Revisión confirmada"
+        out.append({**e, "c": c, "txt": txt, "atencion": c["alerta"] + c["aviso"]})
+    return out
 
 CONSULTA = """
 SELECT t.*, a.nombre AS area_nombre, te.nombre AS tercero_nombre,
@@ -114,13 +189,14 @@ def registrar(con, usuario, accion, trat_id, detalle):
 # ------------------------------------------------------------------ PANTALLAS
 ORDEN = {"rojo": 0, "amarillo": 1, "verde": 2}
 
-CATEGORIAS = [("Común", "Nombre, correo, teléfono, dirección"),
-              ("Económico", "Deudas, pagos, cuentas bancarias, sueldos"),
-              ("Sensible", "Salud, biométricos (huella), origen étnico, etc."),
-              ("Geolocalización", "Ubicación, rutas, dispositivos")]
-GRUPOS = ["Empleados", "Empleados Externos", "Postulantes", "Clientes", "Proveedores", "Familiares de Empleados"]
-EDADES = ["Adultos", "Adolescentes (14-17)", "Niños y niñas (<14)"]
-BASES = ["Consentimiento", "Contrato", "Obligación legal", "Interés legítimo", "Obligación económica", "Defensa de derechos"]
+CATEGORIAS = [("Común", "Nombre, Correo Electrónico, Teléfono, Dirección"),
+              ("Económico", "Deudas, Pagos, Cuentas Bancarias, Remuneraciones"),
+              ("Sensible", "Salud, Datos Biométricos, Origen Étnico, entre otros"),
+              ("Geolocalización", "Ubicación, Rutas, Dispositivos")]
+GRUPOS = ["Trabajadores", "Trabajadores Externos", "Postulantes", "Clientes", "Proveedores", "Familiares de Trabajadores"]
+MAYOR, ADOLESC, MENOR14 = "Mayores de Edad", "Adolescentes (14 a 17 años)", "Niños y Niñas (Menores de 14 años)"
+EDADES = [MAYOR, ADOLESC, MENOR14]
+BASES = ["Consentimiento", "Contrato", "Obligación Legal", "Interés Legítimo", "Defensa de Derechos"]
 
 def lista_areas():
     con = conectar()
@@ -134,7 +210,8 @@ def cargar_filas():
     filas = []
     for t in con.execute(CONSULTA + " WHERE t.suprimido = 0 ORDER BY t.id"):
         brechas, semaforo, supresion, dias = analizar(t)
-        filas.append({"t": t, "brechas": brechas, "semaforo": semaforo, "supresion": supresion, "dias": dias})
+        filas.append({"t": t, "brechas": brechas, "semaforo": semaforo, "supresion": supresion, "dias": dias,
+                      "etapas": etapas_de(t, brechas, supresion, dias)})
     con.close()
     if session.get("rol") == "area":          # el Responsable de Área solo ve su área
         filas = [f for f in filas if f["t"]["area_id"] == session.get("area_id", 1)]
@@ -165,21 +242,21 @@ def fecha(texto):
 app.jinja_env.filters["fecha"] = fecha
 
 # ------------------------------------------------------------------ ROL, AYUDAS Y TEXTOS
-QUE_HACER = [("venció", "Suprime los datos y confirma la Supresión."),
-             ("vence en", "Prepara la Supresión antes de que termine el Plazo."),
-             ("No se definió", "Define por cuántos meses se guardarán los datos."),
-             ("base de licitud", "Define con qué Derecho se tratan estos datos (por ejemplo, Contrato o Consentimiento)."),
-             ("sin base", "Define con qué Derecho se tratan estos datos (por ejemplo, Contrato o Consentimiento)."),
-             ("niños y niñas", "Obtén el Consentimiento de sus padres o representantes y regístralo."),
-             ("adolescentes", "Verifica la edad y, si hay menores de 16 años, pide el Consentimiento de sus padres."),
-             ("no tiene contrato", "Pide o renueva el Contrato con el Proveedor."),
-             ("cláusula de supresión", "Agrega al Contrato la obligación de eliminar los datos al terminar."),
-             ("revisado por una persona", "Revisa el Tratamiento y presiona Confirmar Revisión.")]
+QUE_HACER = [("venció", "Suprimir los datos y confirmar la Supresión."),
+             ("vence en", "Preparar la Supresión antes del término del Plazo de Conservación."),
+             ("No se definió", "Definir el Plazo de Conservación en meses."),
+             ("base de licitud", "Determinar el fundamento de licitud del Tratamiento (por ejemplo, Contrato o Consentimiento)."),
+             ("sin base", "Determinar el fundamento de licitud del Tratamiento (por ejemplo, Contrato o Consentimiento)."),
+             ("niños y niñas", "Obtener el Consentimiento de los padres o representantes y registrarlo."),
+             ("adolescentes", "Verificar la edad de los titulares y, si existen menores de 16 años, solicitar el Consentimiento de sus padres o representantes."),
+             ("no tiene contrato", "Solicitar o renovar el Contrato con el Tercero Receptor."),
+             ("cláusula de supresión", "Incorporar al Contrato la obligación de suprimir los datos al término de la relación."),
+             ("revisión de una persona", "Revisar el Tratamiento y presionar Confirmar Revisión.")]
 
 def que_hacer(texto):
     for clave, ayuda in QUE_HACER:
         if clave.lower() in texto.lower(): return ayuda
-    return "Revisa este punto con tu equipo."
+    return "Revisar este punto con el equipo responsable."
 app.jinja_env.globals["que_hacer"] = que_hacer
 
 @app.context_processor
@@ -188,7 +265,8 @@ def contexto():
     areas = lista_areas()
     area_id = session.get("area_id", 1)
     area = next((a for a in areas if a["id"] == area_id), areas[0])
-    return {"rol": rol, "areas_menu": areas, "area_actual": area, "ep": request.endpoint}
+    return {"rol": rol, "areas_menu": areas, "area_actual": area, "ep": request.endpoint,
+            "etapas_menu": ETAPAS, "etapa_k": (request.view_args or {}).get("clave")}
 
 @app.route("/rol/<r>")
 def cambiar_rol(r):
@@ -196,6 +274,19 @@ def cambiar_rol(r):
     a = request.args.get("area", type=int)
     if a: session["area_id"] = a
     return redirect(request.referrer or url_for("inicio"))
+
+@app.route("/etapa/<clave>")
+def etapa(clave):
+    """Una etapa del ciclo de vida: qué dice la Ley, qué revisa el sistema y en qué estado está cada tratamiento."""
+    e = ETAPA_POR_K.get(clave)
+    if e is None: abort(404)
+    filas = cargar_filas()
+    filas.sort(key=lambda f: (ESTADO_ORDEN[f["etapas"][clave][0]], f["t"]["id"]))
+    cuenta = {x: sum(1 for f in filas if f["etapas"][clave][0] == x) for x in ESTADO_ORDEN}
+    con = conectar()
+    sup = con.execute(CONSULTA + " WHERE t.suprimido = 1 ORDER BY t.id").fetchall() if clave == "suprimir" else []
+    con.close()
+    return render_template("etapa.html", e=e, filas=filas, cuenta=cuenta, suprimidos=sup)
 
 @app.route("/plazos")
 def plazos():
@@ -236,8 +327,9 @@ def inicio():
     dias_es = ["lunes","martes","miércoles","jueves","viernes","sábado","domingo"]
     meses_es = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"]
     h = date.today()
-    hoy_texto = f"{dias_es[h.weekday()].capitalize()}, {h.day} de {meses_es[h.month-1].capitalize()} de {h.year}"
-    return render_template("inicio.html", hoy_texto=hoy_texto, cuenta=cuenta, total=len(filas), urgentes=urgentes,
+    hoy_texto = f"{dias_es[h.weekday()].capitalize()}, {h.day} de {meses_es[h.month-1]} de {h.year}"
+    con2 = conectar(); suprimidos = con2.execute("SELECT COUNT(*) FROM tratamiento WHERE suprimido = 1").fetchone()[0]; con2.close()
+    return render_template("inicio.html", ciclo=resumen_ciclo(filas, suprimidos), hoy_texto=hoy_texto, cuenta=cuenta, total=len(filas), urgentes=urgentes,
                            por_vencer=por_vencer, sin_revisar=len(sin_revisar), ultimas=ultimas, por_area=por_area)
 
 @app.route("/registro")
@@ -262,7 +354,8 @@ def detalle(tid):
     brechas, semaforo, supresion, dias = analizar(t)
     hist = con.execute("SELECT * FROM bitacora WHERE tratamiento_id = ? ORDER BY id DESC", (tid,)).fetchall()
     con.close()
-    return render_template("detalle.html", es_nuevo=request.args.get("nuevo"), t=t, brechas=brechas, semaforo=semaforo, supresion=supresion, dias=dias, hist=hist)
+    et = etapas_de(t, brechas, supresion, dias)
+    return render_template("detalle.html", es_nuevo=request.args.get("nuevo"), t=t, brechas=brechas, semaforo=semaforo, supresion=supresion, dias=dias, hist=hist, et=et)
 
 @app.route("/tratamiento/<int:tid>/revisar", methods=["POST"])
 def revisar(tid):
@@ -298,24 +391,25 @@ def nuevo():
                  ("area_id", "actividad", "finalidad", "categoria_dato", "detalle_datos", "grupo_titular", "titulares",
                   "base_licitud", "origen", "plazo_meses", "fecha_inicio", "tercero_id", "medidas_seguridad", "usuario")}
         datos["usuario"] = titulo(datos["usuario"])
-        if not datos["actividad"]: errores.append("Cuéntanos qué actividad es (por ejemplo: Contratación de personal).")
-        if not datos["finalidad"]: errores.append("Indica para qué se usan los datos.")
-        if not datos["usuario"]: errores.append("Escribe tu nombre: la persona que registra queda en la Bitácora.")
+        for k in ("finalidad", "detalle_datos", "origen", "medidas_seguridad"): datos[k] = titulo(datos[k])
+        if not datos["actividad"]: errores.append("Se debe indicar la Actividad de Tratamiento (por ejemplo: Contratación de Personal).")
+        if not datos["finalidad"]: errores.append("Se debe indicar la Finalidad del Tratamiento.")
+        if not datos["usuario"]: errores.append("Se debe indicar el nombre del responsable del registro, que queda en la Bitácora de Decisiones.")
         if not datos["area_id"].isdigit() or not any(str(a["id"]) == datos["area_id"] for a in areas):
-            errores.append("Elige el área responsable.")
-        if datos["categoria_dato"] not in [c for c, _ in CATEGORIAS]: errores.append("Elige la categoría de los datos.")
-        if datos["grupo_titular"] not in GRUPOS: errores.append("Elige de quién son los datos.")
-        if datos["titulares"] not in EDADES: errores.append("Indica la edad de las personas.")
+            errores.append("Se debe seleccionar el Área Responsable.")
+        if datos["categoria_dato"] not in [c for c, _ in CATEGORIAS]: errores.append("Se debe seleccionar la Categoría de Datos Personales.")
+        if datos["grupo_titular"] not in GRUPOS: errores.append("Se debe seleccionar la Categoría de Titulares.")
+        if datos["titulares"] not in EDADES: errores.append("Se debe seleccionar el Tramo Etario de los Titulares.")
         if datos["base_licitud"] and datos["base_licitud"] not in BASES: errores.append("La Base de Licitud no es válida.")
         try:
             plazo = int(datos["plazo_meses"]) if datos["plazo_meses"] else None
             if plazo is not None and plazo < 1: raise ValueError
         except ValueError:
-            plazo = None; errores.append("El Plazo debe ser un número de meses mayor que 0.")
+            plazo = None; errores.append("El Plazo de Conservación debe ser un número de meses mayor que 0.")
         try:
             date.fromisoformat(datos["fecha_inicio"])
         except ValueError:
-            errores.append("Indica la fecha desde la que se tratan los datos.")
+            errores.append("Se debe indicar la Fecha de Inicio del Tratamiento.")
         if not errores:
             area = next(a for a in areas if str(a["id"]) == datos["area_id"])
             cur = con.execute("""INSERT INTO tratamiento (area_id, actividad, finalidad, categoria_dato, detalle_datos,
@@ -327,12 +421,38 @@ def nuevo():
                          datos["fecha_inicio"], int(datos["tercero_id"]) if datos["tercero_id"].isdigit() else None,
                          datos["medidas_seguridad"] or None))
             tid = cur.lastrowid
-            registrar(con, datos["usuario"], "Alta", tid, f"Se registra el Tratamiento «{titulo(datos['actividad'])}».")
+            registrar(con, datos["usuario"], "Alta", tid, f"Alta del Tratamiento «{titulo(datos['actividad'])}».")
             con.commit(); con.close()
             return redirect(url_for("detalle", tid=tid, nuevo=1))
     con.close()
     return render_template("nuevo.html", areas=areas, terceros=terceros, categorias=CATEGORIAS, grupos=GRUPOS,
                            edades=EDADES, bases=BASES, errores=errores, d=datos, hoy=date.today().isoformat())
+
+@app.route("/informe")
+def informe():
+    """Informe de Seguimiento: foto del estado de cumplimiento, lista para imprimir o guardar como PDF."""
+    filas = cargar_filas()
+    filas.sort(key=lambda x: (ORDEN[x["semaforo"]], x["t"]["id"]))
+    total = len(filas)
+    cuenta = {k: sum(1 for f in filas if f["semaforo"] == k) for k in ORDEN}
+    resumen = {
+        "revisados": sum(1 for f in filas if f["t"]["revisado_por"]),
+        "vencidos": sum(1 for f in filas if f["dias"] is not None and f["dias"] < 0),
+        "por_vencer": sum(1 for f in filas if f["dias"] is not None and 0 <= f["dias"] <= 30),
+        "pct_orden": round(cuenta["verde"] / total * 100) if total else 0,
+    }
+    pendientes = [f for f in filas if f["brechas"]]
+    con = conectar()
+    suprimidos = con.execute("SELECT COUNT(*) FROM tratamiento WHERE suprimido = 1").fetchone()[0]
+    if session.get("rol") == "area":
+        movs = con.execute("""SELECT b.*, t.actividad FROM bitacora b JOIN tratamiento t ON t.id = b.tratamiento_id
+                              WHERE t.area_id = ? ORDER BY b.id DESC LIMIT 8""", (session.get("area_id", 1),)).fetchall()
+    else:
+        movs = con.execute("""SELECT b.*, t.actividad FROM bitacora b
+                              LEFT JOIN tratamiento t ON t.id = b.tratamiento_id ORDER BY b.id DESC LIMIT 8""").fetchall()
+    con.close()
+    return render_template("informe.html", ciclo=resumen_ciclo(filas, suprimidos), filas=filas, total=total, cuenta=cuenta, resumen=resumen,
+                           pendientes=pendientes, suprimidos=suprimidos, movs=movs, hoy=date.today())
 
 @app.route("/bitacora")
 def bitacora():
@@ -347,4 +467,4 @@ if __name__ == "__main__":
         print("No encuentro la base de datos en:", RUTA_BD)
         print("Primero ejecuta crear_bd.py dentro de la carpeta 'Base de Datos'.")
     else:
-        app.run(debug=True)
+        app.run(host="127.0.0.1", port=5000, debug=False)

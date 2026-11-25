@@ -2,22 +2,22 @@
 {% block titulo %}Cómo Funciona{% endblock %}
 {% block contenido %}
 <h1>Cómo Funciona Transparenta</h1>
-<div class="muted fs-5 mb-3">Un ejemplo paso a paso: Camila, de Recursos Humanos, empieza un proceso de reclutamiento.</div>
-<div class="ley mb-4"><i class="bi bi-journal-check"></i> <b>Objetivo:</b> que la empresa pueda demostrar el cumplimiento de la Ley N°&nbsp;21.719, con cada Decisión confirmada por una persona.</div>
+<div class="muted fs-5 mb-3">Ejemplo paso a paso: la Responsable de Recursos Humanos inicia un proceso de reclutamiento.</div>
+<div class="ley mb-4"><i class="bi bi-journal-check"></i> <b>Objetivo:</b> permitir que la empresa demuestre el cumplimiento de la Ley N°&nbsp;21.719, con cada Decisión confirmada por una persona.</div>
 <div class="row g-3"><section class="col-lg-8"><div class="tarjeta">
 {% for n,quien,t,s,cuando,c in [
- (1,'Responsable de Área','Camila registra la actividad','Entra a Nuevo Registro y responde 4 pasos cortos: qué se hace, qué datos usa, con qué Derecho y por cuánto tiempo.','Cuándo: cada vez que su área empieza una actividad nueva con Datos Personales.','#E8F5FC'),
- (2,'El sistema','Transparenta revisa el Registro','Compara lo que Camila ingresó con la Ley N°&nbsp;21.719 y pinta un Semáforo: rojo, amarillo o verde.','Cuándo: al instante, al guardar.','#FFF3C4'),
- (3,'Responsable de Área','Camila resuelve cada Brecha','El sistema le explica qué falta y qué hacer, por ejemplo renovar un Contrato o suprimir datos vencidos.','Cuándo: cuando Camila abre el Tratamiento desde su Inicio.','#EFEAFB'),
- (4,'Responsable de Área','Camila confirma su Decisión','Presiona Confirmar Revisión o Marcar como Suprimido. El sistema nunca decide solo.','Cuándo: después de resolver las Brechas.','#E9F7EF'),
- (5,'Coordinación de Cumplimiento','Coordinación supervisa todo','Ve el estado de todas las áreas, los Plazos que vencen y la Bitácora de Decisiones.','Cuándo: cada semana, o antes de una Auditoría.','#FFE9E7')] %}
+ (1,'Responsable de Área','Registro de la Actividad','En Nuevo Registro se completan cuatro pasos: actividad y finalidad, datos y titulares, Base de Licitud, y Plazo de Conservación.','Frecuencia: cada vez que el área inicia una actividad con Datos Personales.','#E8F5FC'),
+ (2,'Sistema','Verificación Automática','Transparenta contrasta el Registro con la Ley N°&nbsp;21.719 y asigna un Semáforo: rojo, amarillo o verde.','Frecuencia: de forma inmediata al guardar.','#FFF3C4'),
+ (3,'Responsable de Área','Resolución de Brechas','El sistema indica la Brecha y la Acción Correctiva, por ejemplo renovar un Contrato o suprimir datos vencidos.','Frecuencia: al abrir el Tratamiento desde el Inicio.','#EFEAFB'),
+ (4,'Responsable de Área','Confirmación de la Decisión','Se presiona Confirmar Revisión o Marcar como Suprimido. El sistema nunca decide por sí solo.','Frecuencia: una vez resueltas las Brechas.','#E9F7EF'),
+ (5,'Coordinación de Cumplimiento','Supervisión General','Se revisa el estado de todas las áreas, los Plazos de Conservación y la Bitácora de Decisiones.','Frecuencia: semanal o previa a una Auditoría.','#FFE9E7')] %}
 <div class="fila align-items-start" style="padding:18px 0"><span class="paso-n" style="background:{{ c }};width:44px;height:44px;font-size:1.2rem">{{ n }}</span>
  <div><div class="d-flex gap-2 flex-wrap align-items-center mb-1"><b class="fs-5">{{ t }}</b><span class="pastilla" style="background:{{ c }}">{{ quien }}</span></div><div>{{ s }}</div><div class="muted small mt-1">{{ cuando }}</div></div></div>
 {% endfor %}</div></section>
 <aside class="col-lg-4 d-flex flex-column gap-3">
- <section class="tarjeta celeste"><h2 style="font-size:1.35rem">¿Quién usa Transparenta?</h2>
-  <p class="mb-2"><b>Responsable de Área</b><br>Una persona de cada área (Recursos Humanos, Finanzas, Comercial y Soporte TI) que registra y resuelve lo suyo.</p>
-  <p class="mb-0"><b>Coordinación de Cumplimiento</b><br>Ve todas las áreas y la Bitácora. No registra por los demás.</p></section>
- <section class="tarjeta van"><h2 style="font-size:1.35rem">Importante</h2><p class="mb-0">Las reglas del sistema son un Apoyo y no reemplazan el Análisis Jurídico. Cada Decisión la confirma una persona.</p></section>
+ <section class="tarjeta celeste"><h2 style="font-size:1.35rem">Perfiles de Usuario</h2>
+  <p class="mb-2"><b>Responsable de Área</b><br>Persona de cada área (Recursos Humanos, Finanzas, Comercial y Soporte TI) que registra y resuelve los Tratamientos de su área.</p>
+  <p class="mb-0"><b>Coordinación de Cumplimiento</b><br>Visualiza todas las áreas y la Bitácora de Decisiones. No registra en nombre de otras áreas.</p></section>
+ <section class="tarjeta van"><h2 style="font-size:1.35rem">Importante</h2><p class="mb-0">Las reglas del sistema son una herramienta de apoyo y no reemplazan el Análisis Jurídico. Cada Decisión es confirmada por una persona.</p></section>
 </aside></div>
 {% endblock %}

@@ -3,51 +3,51 @@
 {% block contenido %}
 <div class="muted fw-bold" id="paso-txt">Nuevo Registro · Paso 1 de 4</div>
 <h1 id="paso-tit">¿Qué se hace con los datos?</h1>
-<div class="muted fs-5 mb-3">Responde en lenguaje simple. No necesitas saber de leyes: el sistema revisa por ti.</div>
-{% if errores %}<div class="alert alert-danger rounded-4"><b>Revisa estos puntos:</b><ul class="mb-0">{% for e in errores %}<li>{{ e }}</li>{% endfor %}</ul></div>{% endif %}
+<div class="muted fs-5 mb-3">Se completan cuatro pasos. El sistema contrasta cada respuesta con la Ley N°&nbsp;21.719 y detecta las Brechas de forma automática.</div>
+{% if errores %}<div class="alert alert-danger rounded-4"><b>Se deben corregir los siguientes puntos:</b><ul class="mb-0">{% for e in errores %}<li>{{ e }}</li>{% endfor %}</ul></div>{% endif %}
 <div class="stepper" id="stepper">
-  {% for n,t in [(1,'Actividad'),(2,'Datos'),(3,'Base de Licitud'),(4,'Plazo y Seguridad')] %}<div class="st" data-n="{{ n }}"><i>{{ n }}</i>{{ t }}</div>{% endfor %}
+  {% for n,t in [(1,'Actividad'),(2,'Datos Personales'),(3,'Base de Licitud'),(4,'Plazo y Terceros')] %}<div class="st" data-n="{{ n }}"><i>{{ n }}</i>{{ t }}</div>{% endfor %}
 </div>
 <form method="post" id="form" novalidate>
 <div class="row g-3 align-items-start">
  <div class="col-lg-8">
   <section class="tarjeta paso" data-n="1">
     <div class="ley mb-3"><i class="bi bi-journal-check"></i> <b>Ley N°&nbsp;21.719:</b> toda actividad que usa Datos Personales debe estar registrada y tener una Finalidad clara.</div>
-    <label class="fw-bold" for="actividad">Actividad</label><input class="form-control mb-1" id="actividad" name="actividad" placeholder="Ejemplo: Proceso de reclutamiento" value="{{ d.get('actividad','') }}">
-    <div class="muted small mb-3">¿Qué hace tu área con Datos Personales?</div>
-    <label class="fw-bold" for="area_id">Área responsable</label>
+    <label class="fw-bold" for="actividad">Actividad de Tratamiento</label><input class="form-control mb-1" id="actividad" name="actividad" placeholder="Ejemplo: Proceso de Reclutamiento" value="{{ d.get('actividad','') }}">
+    <div class="muted small mb-3">Actividad del área que utiliza Datos Personales.</div>
+    <label class="fw-bold" for="area_id">Área Responsable</label>
     <select class="form-select mb-1" id="area_id" name="area_id">{% for a in areas %}<option value="{{ a.id }}" {{ 'selected' if (d.get('area_id') and d.get('area_id')==a.id|string) or (not d.get('area_id') and ((rol=='area' and a.id==area_actual.id) or (rol!='area' and loop.first))) }}>{{ a.nombre }} · {{ a.responsable }}</option>{% endfor %}</select>
-    <div class="muted small mb-3">Quién responde por esta actividad.</div>
-    <label class="fw-bold" for="finalidad">Finalidad</label><input class="form-control mb-1" id="finalidad" name="finalidad" placeholder="Ejemplo: Evaluar postulantes a cargos" value="{{ d.get('finalidad','') }}">
-    <div class="muted small">¿Para qué se usan estos datos?</div>
+    <div class="muted small mb-3">Área que responde por esta actividad.</div>
+    <label class="fw-bold" for="finalidad">Finalidad del Tratamiento</label><input class="form-control mb-1" id="finalidad" name="finalidad" placeholder="Ejemplo: Evaluar Postulantes a Cargos" value="{{ d.get('finalidad','') }}">
+    <div class="muted small">Objetivo específico para el cual se utilizan los datos.</div>
   </section>
   <section class="tarjeta paso d-none" data-n="2">
     <div class="ley mb-3"><i class="bi bi-journal-check"></i> <b>Ley N°&nbsp;21.719:</b> los Datos Sensibles y los datos de menores de edad tienen reglas más estrictas.</div>
-    <div class="fw-bold">Tipo de datos</div><div class="muted small mb-2">Común: nombre y correo. Sensible: salud, huella digital u origen étnico.</div>
+    <div class="fw-bold">Categoría de Datos Personales</div><div class="muted small mb-2">Común: Nombre y Correo Electrónico. Sensible: Salud, Huella Digital u Origen Étnico.</div>
     <div class="opcion mb-3">{% for c,ej in categorias %}<input class="btn-check" type="radio" name="categoria_dato" id="c{{ loop.index }}" value="{{ c }}" {{ 'checked' if d.get('categoria_dato')==c }}><label for="c{{ loop.index }}" title="{{ ej }}">{{ c }}</label>{% endfor %}</div>
-    <div class="fw-bold">¿De quién son los datos?</div><div class="muted small mb-2">Elige el grupo principal.</div>
+    <div class="fw-bold">Categoría de Titulares</div><div class="muted small mb-2">Se selecciona el grupo principal de titulares.</div>
     <div class="opcion mb-3">{% for g in grupos %}<input class="btn-check" type="radio" name="grupo_titular" id="g{{ loop.index }}" value="{{ g }}" {{ 'checked' if d.get('grupo_titular')==g }}><label for="g{{ loop.index }}">{{ g }}</label>{% endfor %}</div>
-    <div class="fw-bold mb-2">Edad de las personas</div>
-    <div class="opcion mb-3">{% for e in edades %}<input class="btn-check" type="radio" name="titulares" id="e{{ loop.index }}" value="{{ e }}" {{ 'checked' if d.get('titulares')==e }}><label for="e{{ loop.index }}">{{ e.replace('(14-17)','(14 a 17 años)').replace('(<14)','(menores de 14 años)') }}</label>{% endfor %}</div>
-    <label class="fw-bold" for="detalle_datos">Ejemplos de datos <span class="muted fw-normal">(opcional)</span></label><input class="form-control mb-3" id="detalle_datos" name="detalle_datos" placeholder="Ejemplo: nombre, correo, currículum" value="{{ d.get('detalle_datos','') }}">
-    <label class="fw-bold" for="origen">¿De dónde vienen los datos? <span class="muted fw-normal">(opcional)</span></label><input class="form-control" id="origen" name="origen" placeholder="Ejemplo: formulario web" value="{{ d.get('origen','') }}">
+    <div class="fw-bold mb-2">Tramo Etario de los Titulares</div>
+    <div class="opcion mb-3">{% for e in edades %}<input class="btn-check" type="radio" name="titulares" id="e{{ loop.index }}" value="{{ e }}" {{ 'checked' if d.get('titulares')==e }}><label for="e{{ loop.index }}">{{ e }}</label>{% endfor %}</div>
+    <label class="fw-bold" for="detalle_datos">Datos Personales Tratados <span class="muted fw-normal">(opcional)</span></label><input class="form-control mb-3" id="detalle_datos" name="detalle_datos" placeholder="Ejemplo: Nombre, Correo Electrónico, Currículum" value="{{ d.get('detalle_datos','') }}">
+    <label class="fw-bold" for="origen">Origen de los Datos <span class="muted fw-normal">(opcional)</span></label><input class="form-control" id="origen" name="origen" placeholder="Ejemplo: Formulario Web" value="{{ d.get('origen','') }}">
   </section>
   <section class="tarjeta paso d-none" data-n="3">
-    <div class="ley mb-3"><i class="bi bi-journal-check"></i> <b>Ley N°&nbsp;21.719 (Arts. 12 y 13):</b> todo Tratamiento necesita una Base de Licitud, es decir, un motivo válido.</div>
-    <div class="fw-bold mb-2">¿Con qué Derecho se tratan estos datos?</div>
+    <div class="ley mb-3"><i class="bi bi-journal-check"></i> <b>Ley N°&nbsp;21.719 (Arts. 12 y 13):</b> todo Tratamiento necesita una Base de Licitud, es decir, un fundamento válido.</div>
+    <div class="fw-bold mb-2">Base de Licitud del Tratamiento</div>
     <div class="opcion mb-1">{% for b in bases %}<input class="btn-check" type="radio" name="base_licitud" id="b{{ loop.index }}" value="{{ b }}" {{ 'checked' if d.get('base_licitud')==b }}><label for="b{{ loop.index }}">{{ b }}</label>{% endfor %}
-      <input class="btn-check" type="radio" name="base_licitud" id="b0" value="" {{ 'checked' if not d.get('base_licitud') }}><label for="b0">Aún no la sé</label></div>
-    <div class="muted small">Si todavía no la sabes, el sistema lo marcará como Brecha para que la resuelvas.</div>
+      <input class="btn-check" type="radio" name="base_licitud" id="b0" value="" {{ 'checked' if not d.get('base_licitud') }}><label for="b0">Aún No Definida</label></div>
+    <div class="muted small">Si aún no se define, el sistema la registra como Brecha para su posterior resolución.</div>
   </section>
   <section class="tarjeta paso d-none" data-n="4">
-    <div class="ley mb-3"><i class="bi bi-journal-check"></i> <b>Ley N°&nbsp;21.719:</b> los datos se guardan solo el tiempo necesario, y los Terceros que los reciben deben tener Contrato.</div>
+    <div class="ley mb-3"><i class="bi bi-journal-check"></i> <b>Ley N°&nbsp;21.719:</b> los datos se conservan solo durante el tiempo necesario, y los Terceros que los reciben deben contar con Contrato.</div>
     <div class="row g-3">
-     <div class="col-sm-6"><label class="fw-bold" for="plazo_meses">Plazo de conservación</label><input class="form-control" type="number" min="1" id="plazo_meses" name="plazo_meses" placeholder="6" value="{{ d.get('plazo_meses','') }}"><div class="muted small">Meses que se guardarán los datos.</div></div>
-     <div class="col-sm-6"><label class="fw-bold" for="fecha_inicio">Desde</label><input class="form-control" type="date" id="fecha_inicio" name="fecha_inicio" value="{{ d.get('fecha_inicio', hoy) }}"><div class="muted small">Fecha en que empezó el Tratamiento.</div></div>
-     <div class="col-12"><label class="fw-bold" for="tercero_id">Tercero que recibe los datos <span class="muted fw-normal">(opcional)</span></label>
+     <div class="col-sm-6"><label class="fw-bold" for="plazo_meses">Plazo de Conservación</label><input class="form-control" type="number" min="1" id="plazo_meses" name="plazo_meses" placeholder="6" value="{{ d.get('plazo_meses','') }}"><div class="muted small">Cantidad de meses durante los cuales se conservarán los datos.</div></div>
+     <div class="col-sm-6"><label class="fw-bold" for="fecha_inicio">Fecha de Inicio del Tratamiento</label><input class="form-control" type="date" id="fecha_inicio" name="fecha_inicio" value="{{ d.get('fecha_inicio', hoy) }}"><div class="muted small">Fecha en que comenzó el Tratamiento.</div></div>
+     <div class="col-12"><label class="fw-bold" for="tercero_id">Tercero Receptor <span class="muted fw-normal">(opcional)</span></label>
       <select class="form-select" id="tercero_id" name="tercero_id"><option value="">Ninguno</option>{% for t in terceros %}<option value="{{ t.id }}" data-contrato="{{ t.contrato_vigente }}" data-clausula="{{ t.clausula_supresion }}" {{ 'selected' if d.get('tercero_id')==t.id|string }}>{{ t.nombre }}</option>{% endfor %}</select></div>
-     <div class="col-12"><label class="fw-bold" for="medidas_seguridad">Medidas de seguridad <span class="muted fw-normal">(opcional)</span></label><input class="form-control" id="medidas_seguridad" name="medidas_seguridad" placeholder="Ejemplo: acceso restringido" value="{{ d.get('medidas_seguridad','') }}"></div>
-     <div class="col-12"><label class="fw-bold" for="usuario">Tu nombre</label><input class="form-control" id="usuario" name="usuario" placeholder="Quien registra queda en la Bitácora de Decisiones" value="{{ d.get('usuario','') }}"></div>
+     <div class="col-12"><label class="fw-bold" for="medidas_seguridad">Medidas de Seguridad <span class="muted fw-normal">(opcional)</span></label><input class="form-control" id="medidas_seguridad" name="medidas_seguridad" placeholder="Ejemplo: Acceso Restringido" value="{{ d.get('medidas_seguridad','') }}"></div>
+     <div class="col-12"><label class="fw-bold" for="usuario">Nombre del Responsable del Registro</label><input class="form-control" id="usuario" name="usuario" placeholder="Queda registrado en la Bitácora de Decisiones" value="{{ d.get('usuario','') }}"></div>
     </div>
   </section>
   <div class="alert alert-warning rounded-4 mt-3 d-none" id="aviso-paso"></div>
@@ -57,15 +57,15 @@
   </div>
  </div>
  <aside class="col-lg-4"><section class="tarjeta van" style="position:sticky;top:16px">
-  <div class="d-flex align-items-center gap-2 mb-1"><span class="luz amarillo" id="luz-vivo" style="width:18px;height:18px"></span><h2 class="mb-0" style="font-size:1.3rem">Así Va tu Semáforo</h2></div>
-  <div class="muted mb-3">Se actualiza solo mientras respondes.</div><div id="vivo"></div>
-  <div class="small mt-2">Al guardar, el sistema te mostrará el detalle para que decidas qué hacer.</div></section></aside>
+  <div class="d-flex align-items-center gap-2 mb-1"><span class="luz amarillo" id="luz-vivo" style="width:18px;height:18px"></span><h2 class="mb-0" style="font-size:1.3rem">Semáforo en Tiempo Real</h2></div>
+  <div class="muted mb-3">Se actualiza automáticamente a medida que se completan los datos.</div><div id="vivo"></div>
+  <div class="small mt-2">Al guardar, el sistema presenta el detalle de las Brechas y las acciones correctivas.</div></section></aside>
 </div>
 </form>
 {% endblock %}
 {% block scripts %}
 <script>
-const TIT=["¿Qué se hace con los datos?","¿Qué datos son y de quién?","¿Con qué derecho se tratan?","¿Por cuánto tiempo y con quién?"];
+const TIT=["Identificación de la Actividad de Tratamiento","Datos Personales y Titulares","Base de Licitud","Plazo de Conservación y Terceros"];
 let paso=1;
 const $=s=>document.querySelector(s), v=n=>{const e=document.querySelector(`[name=${n}]:checked`);return e?e.value:""};
 function mostrar(){
@@ -78,9 +78,9 @@ function mostrar(){
 }
 function falta(){
   const m=[];
-  if(paso===1){ if(!$('#actividad').value.trim())m.push('Escribe qué actividad es.'); if(!$('#finalidad').value.trim())m.push('Indica para qué se usan los datos.'); }
-  if(paso===2){ if(!v('categoria_dato'))m.push('Elige el tipo de datos.'); if(!v('grupo_titular'))m.push('Elige de quién son los datos.'); if(!v('titulares'))m.push('Indica la edad de las personas.'); }
-  if(paso===4){ const p=$('#plazo_meses').value; if(p&&+p<1)m.push('El plazo debe ser mayor que 0.'); if(!$('#fecha_inicio').value)m.push('Indica desde qué fecha se tratan los datos.'); if(!$('#usuario').value.trim())m.push('Escribe tu nombre.'); }
+  if(paso===1){ if(!$('#actividad').value.trim())m.push('Se debe indicar la Actividad de Tratamiento.'); if(!$('#finalidad').value.trim())m.push('Se debe indicar la Finalidad del Tratamiento.'); }
+  if(paso===2){ if(!v('categoria_dato'))m.push('Se debe seleccionar la Categoría de Datos Personales.'); if(!v('grupo_titular'))m.push('Se debe seleccionar la Categoría de Titulares.'); if(!v('titulares'))m.push('Se debe seleccionar el Tramo Etario de los Titulares.'); }
+  if(paso===4){ const p=$('#plazo_meses').value; if(p&&+p<1)m.push('El Plazo de Conservación debe ser mayor que 0.'); if(!$('#fecha_inicio').value)m.push('Se debe indicar la Fecha de Inicio del Tratamiento.'); if(!$('#usuario').value.trim())m.push('Se debe indicar el nombre del Responsable del Registro.'); }
   return m;
 }
 $('#sigue').onclick=()=>{const m=falta(); const a=$('#aviso-paso');
@@ -89,13 +89,13 @@ $('#sigue').onclick=()=>{const m=falta(); const a=$('#aviso-paso');
 $('#atras').onclick=()=>{if(paso>1){paso--;mostrar()}};
 function vivo(){
   const b=[], base=v('base_licitud'), cat=v('categoria_dato'), ed=v('titulares'), t=$('#tercero_id'), op=t.options[t.selectedIndex];
-  if(!base){b.push(['Alta','Falta la Base de Licitud.','Arts. 12 y 13 de la Ley N°&nbsp;21.719'])}
-  if(!base&&cat==='Sensible')b.push(['Alta','Dato Sensible sin base que lo respalde.','Arts. 2 g y 16']);
-  if(ed==='Niños y niñas (<14)'&&base!=='Consentimiento')b.push(['Alta','Datos de menores de 14 años sin Consentimiento de sus padres.','Art. 16 quáter']);
-  if(ed==='Adolescentes (14-17)'&&cat==='Sensible'&&base!=='Consentimiento')b.push(['Media','Datos Sensibles de Adolescentes: verifica si hay menores de 16 años.','Art. 16 quáter']);
-  if(t.value){ if(op.dataset.contrato!=='1')b.push(['Media','El Tercero no tiene Contrato vigente.','']); if(op.dataset.clausula!=='1')b.push(['Media','El Contrato no tiene Cláusula de Supresión.','']); }
-  if(!$('#plazo_meses').value)b.push(['Media','Falta definir el Plazo de Conservación.','']);
-  b.push(['Media','Falta la Revisión de una persona.','Se completa al guardar y confirmar']);
+  if(!base){b.push(['Alta','El Tratamiento carece de Base de Licitud.','Arts. 12 y 13 de la Ley N°&nbsp;21.719'])}
+  if(!base&&cat==='Sensible')b.push(['Alta','Dato Sensible sin Base de Licitud que lo respalde.','Arts. 2 g y 16']);
+  if(ed==='Niños y Niñas (Menores de 14 años)'&&base!=='Consentimiento')b.push(['Alta','Datos de menores de 14 años sin Consentimiento de sus padres o representantes.','Art. 16 quáter']);
+  if(ed==='Adolescentes (14 a 17 años)'&&cat==='Sensible'&&base!=='Consentimiento')b.push(['Media','Datos Sensibles de Adolescentes: se debe verificar si existen menores de 16 años.','Art. 16 quáter']);
+  if(t.value){ if(op.dataset.contrato!=='1')b.push(['Media','El Tercero Receptor no tiene Contrato vigente.','']); if(op.dataset.clausula!=='1')b.push(['Media','El Contrato no tiene Cláusula de Supresión.','']); }
+  if(!$('#plazo_meses').value)b.push(['Media','No se definió un Plazo de Conservación.','']);
+  b.push(['Media','El Tratamiento aún no cuenta con Revisión de una persona.','Se completa al guardar y confirmar']);
   const alta=b.some(x=>x[0]==='Alta');
   $('#luz-vivo').className='luz '+(alta?'rojo':'amarillo');
   $('#vivo').innerHTML=b.map(x=>`<div class="bg-white rounded-4 p-2 px-3 mb-2"><span class="pastilla ${x[0]==='Alta'?'':''}" style="background:${x[0]==='Alta'?'#FFE9E7;color:#B83B36':'#FFF8DB;color:#9A6B00'}">${x[0]}</span> <b>${x[1]}</b>${x[2]?`<div class="muted small mt-1">${x[2]}</div>`:''}</div>`).join('');

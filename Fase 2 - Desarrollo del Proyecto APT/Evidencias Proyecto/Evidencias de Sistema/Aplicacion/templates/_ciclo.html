@@ -1,0 +1,15 @@
+{% macro tarjetas(ciclo) %}
+<div class="ciclo">
+{% for e in ciclo %}
+  <a class="ciclo-it {{ 'hay' if e.atencion else 'bien' }}" href="{{ url_for('etapa', clave=e.k) }}">
+    <span class="ciclo-n">{{ e.n }}</span>
+    <i class="bi {{ e.icono }} ciclo-ic"></i>
+    <b class="ciclo-t">{{ e.nombre }}</b>
+    <span class="ciclo-q">{{ e.pregunta }}</span>
+    <span class="ciclo-r">{{ e.txt }}</span>
+    <span class="ciclo-e">{% if e.atencion %}<span class="luz {{ 'rojo' if e.c.alerta else 'amarillo' }}"></span> {{ e.atencion }} con Acción Pendiente{% else %}<span class="luz verde"></span> Sin Pendientes{% endif %}</span>
+  </a>
+{% endfor %}
+</div>
+{% endmacro %}
+{% macro chip(par) %}<span class="chip {{ par[0] }}">{% if par[0]=='ok' %}<i class="bi bi-check-circle-fill"></i>{% elif par[0]=='alerta' %}<i class="bi bi-x-circle-fill"></i>{% elif par[0]=='aviso' %}<i class="bi bi-exclamation-circle-fill"></i>{% else %}<i class="bi bi-dash-circle"></i>{% endif %} {{ par[1] }}</span>{% endmacro %}

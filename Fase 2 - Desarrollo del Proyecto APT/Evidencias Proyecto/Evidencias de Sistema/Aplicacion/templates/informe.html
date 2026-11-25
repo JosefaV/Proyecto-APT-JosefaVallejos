@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% from "_ciclo.html" import tarjetas, chip %}
+{% block titulo %}Informe de Seguimiento{% endblock %}
+{% block contenido %}
+{% set meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'] %}
+<div class="d-flex justify-content-between align-items-end flex-wrap gap-2 mb-3">
+  <div><h1>Informe de Seguimiento</h1>
+    <div class="muted fs-5">Estado de cumplimiento de los Datos Personales, apto para su entrega a una auditoría o a la autoridad que lo requiera.</div></div>
+  <button class="btn btn-banana no-imprimir" onclick="window.print()"><i class="bi bi-printer"></i> Imprimir o Guardar como PDF</button>
+</div>
+
+<div class="tarjeta mb-3">
+  <div class="row g-2">
+    <div class="col-md-4"><span class="eti">Empresa</span><br><b>Nexa Soluciones TI</b> <span class="muted">(datos ficticios)</span></div>
+    <div class="col-md-4"><span class="eti">Fecha de Emisión</span><br><b>{{ hoy.day }} de {{ meses[hoy.month-1] }} de {{ hoy.year }}</b></div>
+    <div class="col-md-4"><span class="eti">Alcance</span><br><b>{% if rol=='area' %}Área de {{ area_actual.nombre }}{% else %}Las cuatro áreas de la empresa{% endif %}</b></div>
+  </div>
+</div>
+
+<div class="tarjeta {{ 'menta' if cuenta.rojo==0 and cuenta.amarillo==0 else 'rosa' if cuenta.rojo else 'van' }} mb-4">
+  <h2 class="mb-1">Conclusión General</h2>
+  {% if total == 0 %}
+    <p class="mb-0">Aún no existen Tratamientos registrados.</p>
+  {% elif cuenta.rojo == 0 and cuenta.amarillo == 0 %}
+    <p class="mb-0 fs-5"><b>Cumplimiento Total.</b> Los {{ total }} Tratamientos se encuentran en orden, sin Brechas.</p>
+  {% else %}
+    <p class="mb-1 fs-5"><b>Cumplimiento Parcial.</b> {{ cuenta.verde }} de {{ total }} Tratamientos se encuentran en orden ({{ resumen.pct_orden }}&nbsp;%).
+      {% if cuenta.rojo %}<b>{{ cuenta.rojo }}</b> requieren acción inmediata{% endif %}{% if cuenta.rojo and cuenta.amarillo %} y {% endif %}{% if cuenta.amarillo %}<b>{{ cuenta.amarillo }}</b> se encuentran por revisar{% endif %}.</p>
+    <p class="muted mb-0">Se considera «En Orden» un Tratamiento sin Brechas: cuenta con Base de Licitud, Plazo de Conservación definido y vigente, Contrato vigente con los Terceros Receptores y Revisión confirmada por una persona.</p>
+  {% endif %}
+</div>
+
+<h2 class="mb-1">Ciclo de Vida de los Datos</h2>
+<div class="muted mb-2">Según la Ley, los Datos Personales recorren cinco etapas. Estado de cada una a la fecha de emisión.</div>
+{{ tarjetas(ciclo) }}
+<div class="mb-4"></div>
+
+<h2 class="mb-1">Seguimiento de cada Tratamiento</h2>
+<div class="muted mb-2">Cada fila corresponde a un Tratamiento y cada columna a una etapa. Se ordenan por prioridad. Tratamientos suprimidos: <b>{{ suprimidos }}</b>.</div>
+<div class="tarjeta p-0 mb-4" style="overflow-x:auto">
+<table class="tabla-inf tabla-ciclo">
+  <thead><tr><th>Tratamiento</th>{% for e in etapas_menu %}<th>{{ e.n }}. {{ e.nombre }}</th>{% endfor %}</tr></thead>
+  <tbody>
+  {% for f in filas %}
+  <tr><td><span class="luz {{ f.semaforo }}"></span> <b>{{ f.t.actividad|titulo }}</b><br><span class="muted small">{{ f.t.area_nombre }}</span></td>
+  {% for e in etapas_menu %}<td>{{ chip(f.etapas[e.k]) }}</td>{% endfor %}</tr>
+  {% else %}<tr><td colspan="6" class="muted">No hay Tratamientos.</td></tr>{% endfor %}
+  </tbody>
+</table></div>
+
+<h2 class="mb-1">Brechas Pendientes</h2>
+<div class="muted mb-2">Brechas por resolver y Acción Correctiva recomendada en cada caso.</div>
+{% for f in pendientes %}
+<div class="mb-3" style="break-inside:avoid">
+  <div class="mb-1"><span class="luz {{ f.semaforo }}"></span> <b>{{ f.t.actividad|titulo }}</b> <span class="muted">· {{ f.t.area_nombre }}</span></div>
+  {% for g, texto in f.brechas %}
+  <div class="brecha {{ g }}"><b>{{ g }}.</b> {{ texto }}<br><span class="muted small"><b>Acción Correctiva:</b> {{ que_hacer(texto) }}</span></div>
+  {% endfor %}
+</div>
+{% else %}<div class="tarjeta menta mb-4">No hay Brechas pendientes.</div>{% endfor %}
+
+<h2 class="mb-1 mt-4">Últimas Decisiones Registradas</h2>
+<div class="muted mb-2">Extracto de la Bitácora de Decisiones: acredita que cada decisión fue confirmada por una persona.</div>
+<div class="tarjeta p-0 mb-4" style="overflow-x:auto">
+<table class="tabla-inf">
+  <thead><tr><th>Fecha</th><th>Acción</th><th>Tratamiento</th><th>Responsable</th></tr></thead>
+  <tbody>
+  {% for b in movs %}<tr><td>{{ b.fecha_hora|fecha }}</td><td>{{ b.accion }}</td><td>{{ b.actividad|titulo or '—' }}</td><td>{{ b.usuario|titulo }}</td></tr>
+  {% else %}<tr><td colspan="4" class="muted">Aún no hay decisiones registradas.</td></tr>{% endfor %}
+  </tbody>
+</table>
+</div>
+
+<div class="ley solo-papel mt-3"><b>Nota:</b> informe generado por Transparenta, herramienta de apoyo para el cumplimiento de la Ley N°&nbsp;21.719. Sus reglas no reemplazan el Análisis Jurídico. Datos ficticios, con fines académicos.</div>
+{% endblock %}

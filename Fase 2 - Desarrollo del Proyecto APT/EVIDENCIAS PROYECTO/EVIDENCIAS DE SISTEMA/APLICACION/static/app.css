@@ -29,7 +29,7 @@ h1,h2{font-weight:600;color:var(--marino)}h1{font-size:2.1rem;margin-bottom:.4re
 .tarjeta{border:1px solid var(--borde);border-radius:8px;padding:20px 24px;background:#fff}
 .tarjeta.celeste,.tarjeta.van,.tarjeta.rosa,.tarjeta.menta,.tarjeta.lila{border-left-width:6px;border-radius:6px}
 .tarjeta.celeste{background:var(--celeste3);border-left-color:var(--azul)}.tarjeta.van{background:#FFF8DB;border-left-color:var(--amar)}
-.tarjeta.rosa{background:#fff;border-left-color:var(--rojo)}.tarjeta.menta{background:#fff;border-left-color:var(--verde)}.tarjeta.lila{background:#fff;border-left-color:#B9A8E8}
+.tarjeta.rosa{background:#FFEDEB;border-left-color:var(--rojo)}.tarjeta.menta{background:#E9F7EF;border-left-color:var(--verde)}.tarjeta.lila{background:#fff;border-left-color:#B9A8E8}
 .tarjeta.van.kpi{background:#fff}
 .btn{border-radius:6px;font-weight:600;padding:.5rem 1.1rem}
 .btn-banana{background:var(--banana);border:1px solid #E6C766;color:var(--marino)}.btn-banana:hover{background:#FFD35E;border-color:#E6C766;color:var(--marino)}
@@ -56,3 +56,55 @@ h1,h2{font-weight:600;color:var(--marino)}h1{font-size:2.1rem;margin-bottom:.4re
 .pie{border-top:1px solid var(--borde);margin-top:34px;padding-top:14px;font-size:14px;color:var(--gris)}
 a:focus-visible,button:focus-visible{outline:3px solid var(--marino);outline-offset:2px}
 @media(max-width:991px){.contenido{padding:18px 16px}.side{position:fixed;top:72px;bottom:0;z-index:15;box-shadow:2px 0 8px #0003}.topbar{grid-template-columns:auto 1fr auto}.logo{justify-self:center}.rolsel span{display:none}}
+
+/* ---- Informe de Seguimiento: pantalla y papel ---- */
+.kpi-inf{border:1px solid var(--borde);border-radius:8px;padding:14px 18px;background:#fff;height:100%}
+.kpi-inf .num{font-size:2.2rem;font-weight:700;line-height:1.1}
+.tabla-inf{width:100%;border-collapse:collapse;font-size:15px}
+.tabla-inf th{background:var(--celeste3);text-align:left;padding:8px 10px;border-bottom:2px solid var(--azul);font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--gris)}
+.tabla-inf td{padding:9px 10px;border-bottom:1px solid var(--borde);vertical-align:top}
+.tabla-inf tr{break-inside:avoid}
+.estado-inf{display:inline-flex;align-items:center;gap:6px;font-weight:600;white-space:nowrap}
+.solo-papel{display:none}
+@media print{
+  .topbar,.side,.no-imprimir,.pie{display:none!important}
+  .cuerpo{display:block!important}.contenido{padding:0!important;max-width:none!important}
+  .solo-papel{display:block}
+  body{font-size:11pt;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  h1{font-size:20pt}h2{font-size:14pt;break-after:avoid}
+  .tabla-inf{font-size:9.5pt}.tabla-inf th,.tabla-inf td{padding:5px 6px}
+  .kpi-inf .num{font-size:20pt}
+  .brecha{padding:6px 12px;margin-bottom:5px}
+  a{text-decoration:none;color:inherit}
+  @page{size:A4;margin:14mm}
+}
+
+/* ---- Ciclo de vida ---- */
+.sec-fija{padding:14px 24px 4px;font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--gris)}
+.nv-etapa{padding:8px 24px}.nv-etapa .nn,.ruta-p .nn{width:26px;height:26px;border-radius:50%;background:var(--banana);display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex:none}
+.nv-etapa.on .nn{background:var(--marino);color:#fff}
+.ciclo{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+@media(max-width:1300px){.ciclo{grid-template-columns:repeat(2,1fr)}}
+.ciclo-it{position:relative;display:flex;flex-direction:column;gap:6px;border:1px solid var(--borde);border-top:6px solid var(--verde);border-radius:8px;padding:14px 14px 12px;background:#fff;text-decoration:none;color:var(--marino)}
+.ciclo-it.hay{border-top-color:var(--amar)}.ciclo-it:hover{background:var(--celeste3)}
+.ciclo-n{position:absolute;top:10px;right:12px;width:26px;height:26px;border-radius:50%;background:var(--banana);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+.ciclo-ic{font-size:26px}.ciclo-t{font-size:18px}.ciclo-q{font-size:14px;color:var(--gris);line-height:1.3}
+.ciclo-r{font-size:14px;border-top:1px solid var(--borde);padding-top:6px;margin-top:2px}.ciclo-e{font-weight:700;font-size:14px;margin-top:auto}
+.chip{display:inline-flex;gap:6px;align-items:flex-start;font-size:14px;line-height:1.3}
+.chip.ok i{color:#2E8B57}.chip.alerta i{color:#D9534F}.chip.aviso i{color:#D9A400}.chip.info{color:var(--gris)}.chip i{margin-top:2px}
+.ruta{display:flex;flex-wrap:wrap;align-items:center;gap:6px}.ruta-p{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border:1px solid var(--borde);border-radius:20px;text-decoration:none;color:var(--marino)}
+.ruta-p.act{background:var(--marino);color:#fff;border-color:var(--marino)}.ruta-p.act .nn{background:var(--banana);color:var(--marino)}.ruta-f{color:var(--gris)}
+.recorrido{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}@media(max-width:1100px){.recorrido{grid-template-columns:repeat(2,1fr)}}
+.rec{display:flex;flex-direction:column;gap:4px;padding:10px 12px;border:1px solid var(--borde);border-top:5px solid var(--borde);border-radius:6px;background:#fff;text-decoration:none;color:var(--marino)}
+.rec.ok{border-top-color:var(--verde)}.rec.aviso{border-top-color:var(--amar)}.rec.alerta{border-top-color:var(--rojo)}
+.tabla-ciclo td,.tabla-ciclo th{min-width:130px}.tabla-ciclo td:first-child,.tabla-ciclo th:first-child{min-width:190px}
+@media print{.ciclo{grid-template-columns:repeat(5,1fr)}.ciclo-q{display:none}}
+
+/* ---- Inicio: marca ---- */
+.hero{text-align:center;padding:34px 20px 26px;background:linear-gradient(180deg,#EEF7FC 0%,#fff 100%);border-radius:14px;margin-bottom:26px}
+.hero .marca{display:flex;align-items:center;justify-content:center;gap:18px}
+.hero .marca b{font-size:58px;font-weight:700;letter-spacing:-.02em;color:var(--marino);line-height:1}
+.hero .lema{font-size:24px;color:var(--marino);margin-top:10px;font-weight:600}
+.hero .sub{max-width:760px;margin:10px auto 0;color:var(--gris);font-size:17px}
+.hero .acc{margin-top:20px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+@media(max-width:700px){.hero .marca b{font-size:38px}.hero .marca svg{width:56px;height:56px}.hero .lema{font-size:19px}}

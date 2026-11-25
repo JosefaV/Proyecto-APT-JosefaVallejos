@@ -1,16 +1,16 @@
 {% extends "base.html" %}
 {% block titulo %}Qué Exige la Ley{% endblock %}
 {% block contenido %}
-<h1>Qué Exige la Ley N°&nbsp;21.719</h1><div class="muted fs-5 mb-3">La Ley chilena sobre Protección y Tratamiento de Datos Personales. Así la cubre Transparenta.</div>
-<div class="tarjeta celeste mb-4"><b>En simple:</b> toda organización debe saber qué Datos Personales trata, tener un motivo válido para tratarlos, cuidarlos, no guardarlos más de lo necesario y poder demostrarlo. Transparenta ayuda a ordenar eso y a recordar los Plazos.</div>
+<h1>Qué Exige la Ley N°&nbsp;21.719</h1><div class="muted fs-5 mb-3">La Ley chilena sobre Protección y Tratamiento de Datos Personales. Cobertura de Transparenta.</div>
+<div class="tarjeta celeste mb-4"><b>Síntesis:</b> toda organización debe conocer qué Datos Personales trata, contar con un fundamento válido para tratarlos, resguardarlos, conservarlos solo por el tiempo necesario y poder demostrarlo. Transparenta apoya el orden de esa información y el monitoreo de los Plazos de Conservación.</div>
 <div class="tarjeta py-2">
 {% for a,b,c in [
- ('Tener una Base de Licitud','Todo Tratamiento necesita un motivo válido: Consentimiento, Contrato, Obligación Legal, entre otros (Arts. 12 y 13).','Si el Registro no tiene Base de Licitud, aparece una Brecha Alta.'),
- ('Cuidar los Datos Sensibles','Salud, huella digital u origen étnico tienen reglas más estrictas (Arts. 2 g y 16).','Un dato sensible sin base que lo respalde queda en rojo.'),
- ('Proteger a Niños, Niñas y Adolescentes','Los menores de 14 años requieren el Consentimiento de sus padres. Los Datos Sensibles de menores de 16 también (Art. 16 quáter).','El formulario pregunta la edad y marca la Brecha que corresponda.'),
- ('Controlar a los Terceros','Si otra empresa recibe o guarda los datos, debe haber un Contrato vigente con una Cláusula para eliminarlos.','Revisa Contrato y Cláusula de Supresión de cada Tercero.'),
- ('No guardar datos más de lo necesario','Los datos se conservan solo mientras sirvan a su Finalidad. Después, se suprimen.','Calcula la fecha de Supresión y avisa cuando vence.'),
- ('Poder demostrarlo','La organización debe acreditar que cumple y quién tomó cada Decisión.','La Bitácora de Decisiones guarda quién decidió qué y cuándo.')] %}
+ ('Contar con una Base de Licitud','Todo Tratamiento requiere un fundamento válido: Consentimiento, Contrato u Obligación Legal, entre otros (Arts. 12 y 13).','Si el Registro carece de Base de Licitud, se genera una Brecha Alta.'),
+ ('Resguardar los Datos Sensibles','Los datos de salud, biométricos u origen étnico están sujetos a reglas más estrictas (Arts. 2 g y 16).','Un Dato Sensible sin Base de Licitud que lo respalde se clasifica en rojo.'),
+ ('Proteger a Niños, Niñas y Adolescentes','El tratamiento de datos de menores de 14 años requiere el Consentimiento de sus padres o representantes. Los Datos Sensibles de menores de 16 años también (Art. 16 quáter).','El formulario solicita el Tramo Etario de los titulares y genera la Brecha que corresponda.'),
+ ('Controlar a los Terceros Receptores','Cuando otra empresa recibe o almacena los datos, debe existir un Contrato vigente con una Cláusula de Supresión.','Se verifica el Contrato y la Cláusula de Supresión de cada Tercero.'),
+ ('Limitar la Conservación de los Datos','Los datos se conservan solo mientras sean necesarios para su Finalidad; luego se suprimen.','Se calcula la fecha de Supresión y se alerta cuando se aproxima.'),
+ ('Demostrar el Cumplimiento','La organización debe acreditar que cumple y quién adoptó cada Decisión.','La Bitácora de Decisiones registra quién decidió, qué decidió y cuándo.')] %}
 <div class="fila align-items-start" style="padding:16px 0"><i class="bi bi-check2-circle fs-4" style="color:#2E8B57"></i><div class="row flex-fill g-2"><div class="col-lg-7"><b class="fs-5">{{ a }}</b><div>{{ b }}</div></div><div class="col-lg-5"><div class="ley"><b>En Transparenta:</b> {{ c }}</div></div></div></div>
 {% endfor %}</div>
 <div class="ley mt-3"><i class="bi bi-calendar-event"></i> <b>Vigencia:</b> la Ley fue publicada el 13 de Diciembre de 2024. Su Entrada en Vigencia estaba prevista para el 1 de Diciembre de 2026; el Congreso aprobó postergarla al 15 de Octubre de 2027 (pendiente de Promulgación).</div>
